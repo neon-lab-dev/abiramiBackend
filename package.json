@@ -1,0 +1,23 @@
+{
+  "name": "abiramibackend",
+  "version": "1.0.0",
+  "description": "backend for billing software",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.1",
+    "zod-validation-error": "^3.4.0"
+  }
+}
