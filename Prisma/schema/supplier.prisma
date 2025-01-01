@@ -1,18 +1,7 @@
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URI")
-  relationMode = "prisma"
-}
-generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["prismaSchemaFolder"]
-}
-
-
-model Client{
+model Supplier{
     id String @id @default(uuid())
     companyName String
-    contactPerson String
+    title String
     GST String
     mobileNum String
     landLineNum String?
