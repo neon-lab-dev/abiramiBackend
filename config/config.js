@@ -19,9 +19,17 @@ const ENV_CONFIG = createEnv({
         type: "array",
         isUrl: true,
     },
+    FRONTEND_DOMAIN: {
+        value: process.env.FRONTEND_DOMAIN,
+        required: true,
+    },
     NODE_ENV: {
         value: process.env.NODE_ENV || "development",
         required: false,
+    },
+    JWT_SECRET: {
+        value: process.env.JWT_SECRET,
+        required: true,
     },
     MAX_REQUEST_SIZE: {
         value: process.env.MAX_REQUEST_SIZE || "10mb",
