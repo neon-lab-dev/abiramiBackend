@@ -8,6 +8,10 @@ generator client {
   previewFeatures = ["prismaSchemaFolder"]
 }
 
+enum status{
+    ACTIVE
+    INACTIVE
+}
 
 model Client{
     id String @id @default(uuid())
@@ -24,7 +28,7 @@ model Client{
     pincode Int
     state String
     country String
-    status String
+    status status
     createdAt DateTime @default(now())
     updataedAt DateTime @updatedAt
 

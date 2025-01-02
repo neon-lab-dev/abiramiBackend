@@ -9,10 +9,22 @@ const emailSchema = z.string().email();
 // get all clients
 export const getAllClients = catchAsyncErrors(async (req, res) => {
   try {
+    const wehreClause={
+      status: "ACTIVE"
+    }
+
     const clients = await prismadb.client.findMany();
+    const totalCount = await prismadb.client.count();
+    const activeCount = await prismadb.client.count({
+      where: wehreClause
+    });
+    const inactiveCount = totalCount - activeCount;
     return sendResponse(res, {
       status: 200,
       data: clients,
+      totalCount: totalCount,
+      activeCount: activeCount,
+      inactiveCount: inactiveCount
     });
   } catch (error) {
     return sendResponse(res, {
@@ -170,6 +182,56 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
     return sendResponse(res, {
       status: 500,
       error: error.message,
+    });
+  }
+});
+
+
+// get client by mobile number and address
+export const searchClients = catchAsyncErrors(async (req, res) => {
+  try {
+    const { mobileNum, address } = req.query;
+
+    const whereClause = {
+      OR: [
+        mobileNum && {
+          mobileNum: {
+            contains: mobileNum
+          }
+        },
+        address && {
+          OR: [
+            { addressLine1: { contains: address } },
+          ]
+        }
+      ].filter(Boolean)
+    };
+
+    const clients = await prismadb.client.findMany({
+      where: whereClause,
+    });
+    const totalCount = await prismadb.client.count({
+      where: whereClause
+    });
+    const activeCount = await prismadb.client.count({
+      where: {
+        AND: [whereClause, { status: "ACTIVE" }]
+      }
+    });
+    const inactiveCount = totalCount - activeCount;
+
+    return sendResponse(res, {
+      status: 200,
+      data: clients,
+      totalCount: totalCount,
+      activeCount: activeCount,
+      inactiveCount: inactiveCount
+    });
+
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message
     });
   }
 });
