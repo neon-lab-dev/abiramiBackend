@@ -8,19 +8,31 @@ const emailSchema = z.string().email();
 
 // get all suppliers
 export const getAllSuppliers = catchAsyncErrors(async (req, res) => {
-    try {
-      const suppliers = await prismadb.supplier.findMany();
-      return sendResponse(res, {
-        status: 200,
-        data: suppliers,
-      });
-    } catch (error) {
-      return sendResponse(res, {
-        status: 500,
-        error: error.message,
-      });
+  try {
+    const wehreClause={
+      status: "ACTIVE"
     }
-  });
+
+    const suppliers = await prismadb.supplier.findMany();
+    const totalCount = await prismadb.supplier.count();
+    const activeCount = await prismadb.supplier.count({
+      where: wehreClause
+    });
+    const inactiveCount = totalCount - activeCount;
+    return sendResponse(res, {
+      status: 200,
+      data: suppliers,
+      totalCount: totalCount,
+      activeCount: activeCount,
+      inactiveCount: inactiveCount
+    });
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message,
+    });
+  }
+});
 
 // create supplier
 export const createSupplier = catchAsyncErrors(async (req, res) => {
@@ -174,3 +186,52 @@ export const updateSupplier = catchAsyncErrors(async (req, res) => {
     }
   });
   
+
+// get supplier by mobile number and address
+export const searchSuppliers = catchAsyncErrors(async (req, res) => {
+  try {
+    const { mobileNum, address } = req.query;
+
+    const whereClause = {
+      OR: [
+        mobileNum && {
+          mobileNum: {
+            contains: mobileNum
+          }
+        },
+        address && {
+          OR: [
+            { addressLine1: { contains: address } },
+          ]
+        }
+      ].filter(Boolean)
+    };
+
+    const Suppliers = await prismadb.Supplier.findMany({
+      where: whereClause,
+    });
+    const totalCount = await prismadb.Supplier.count({
+      where: whereClause
+    });
+    const activeCount = await prismadb.Supplier.count({
+      where: {
+        AND: [whereClause, { status: "ACTIVE" }]
+      }
+    });
+    const inactiveCount = totalCount - activeCount;
+
+    return sendResponse(res, {
+      status: 200,
+      data: Suppliers,
+      totalCount: totalCount,
+      activeCount: activeCount,
+      inactiveCount: inactiveCount
+    });
+
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message
+    });
+  }
+});
