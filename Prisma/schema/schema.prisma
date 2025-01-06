@@ -1,7 +1,6 @@
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URI")
-  relationMode = "prisma"
 }
 generator client {
   provider = "prisma-client-js"
@@ -11,6 +10,12 @@ generator client {
 enum status{
     ACTIVE
     INACTIVE
+}
+
+enum billingStatus{
+    PAID
+    PENDING
+    DRAFT
 }
 
 model Client{
