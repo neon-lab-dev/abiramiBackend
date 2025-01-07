@@ -2,7 +2,6 @@ import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import { sendResponse } from "../middlewares/sendResponse.js";
 
 import prismadb from "../db/prismaDb.js";
-import { billingStatus } from "@prisma/client";
 
 // get all invoices
 export const getAllInvoices = catchAsyncErrors(async (req, res) => {

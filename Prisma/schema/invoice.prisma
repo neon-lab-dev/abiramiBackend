@@ -23,6 +23,10 @@ model ProductDetails{
     rate Int
     discount Int
     amount Int
+    subTotal Int
+    pfAmount Int
+    taxIgst Int
+    roundOff Int
     total Int
     billingDetailsId String
     billingDetails BillingDetails @relation("ProductToDetails" , fields: [billingDetailsId], references: [id] , onDelete: Cascade)

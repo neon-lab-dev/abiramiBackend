@@ -1,0 +1,22 @@
+model Inventory{
+    id String @id @default(uuid())
+    refrence String
+    category String
+    buyingCost Int
+    quantity Int
+    description String
+    sellingCost Int
+    gstNumber Int
+    quantityType String
+    alarm Int
+    image Image[] @relation("ImageToInventory")
+}
+
+model Image{
+    fileId String @id 
+    name String
+    url String
+    thumbnailUrl String
+    inventoryId String
+    inventory Inventory @relation("ImageToInventory" , fields: [inventoryId], references: [id] , onDelete: Cascade)
+}
