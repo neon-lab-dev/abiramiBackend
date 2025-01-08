@@ -1,15 +1,16 @@
 model Inventory{
     id String @id @default(uuid())
     refrence String
-    category String
     buyingCost Int
     quantity Int
     description String
     sellingCost Int
-    gstNumber Int
+    warehouseLocation String
     quantityType String
     alarm Int
     image Image[] @relation("ImageToInventory")
+    catgoryId String
+    category Category @relation("CategoryToInventory" , fields: [catgoryId], references: [id] , onDelete: Cascade)
 }
 
 model Image{
@@ -19,4 +20,10 @@ model Image{
     thumbnailUrl String
     inventoryId String
     inventory Inventory @relation("ImageToInventory" , fields: [inventoryId], references: [id] , onDelete: Cascade)
+}
+
+model Category{
+    id String @id @default(uuid())
+    category String
+    inventory Inventory[] @relation("CategoryToInventory")
 }

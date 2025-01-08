@@ -56,6 +56,19 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
       });
     }
 
+    const existingInvoice = await prismadb.BillingDetails.findFirst({
+      where: {
+        AND: [{ client }, { billingStatus } , {invoiceType}],
+      },
+    });
+
+    if (existingInvoice) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Invoice already exists",
+      });
+    }
+
     const invoice = await prismadb.BillingDetails.create({
       data: {
         client,
@@ -67,7 +80,7 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
         invoiceType,
         productDetails: {
             create: productDetails
-        }
+      }
       },
     });
 
