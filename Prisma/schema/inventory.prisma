@@ -8,22 +8,22 @@ model Inventory{
     warehouseLocation String
     quantityType String
     alarm Int
-    image Image[] @relation("ImageToInventory")
+    image Image[]
     catgoryId String
     category Category @relation("CategoryToInventory" , fields: [catgoryId], references: [id] , onDelete: Cascade)
 }
 
 model Image{
-    fileId String @id 
+    fileId String @id
     name String
     url String
     thumbnailUrl String
-    inventoryId String
-    inventory Inventory @relation("ImageToInventory" , fields: [inventoryId], references: [id] , onDelete: Cascade)
+    inventoryId String @unique
+    inventory Inventory @relation(fields: [inventoryId], references: [id] , onDelete: Cascade)
 }
 
 model Category{
     id String @id @default(uuid())
-    category String
+    name String
     inventory Inventory[] @relation("CategoryToInventory")
 }

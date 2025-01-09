@@ -1,6 +1,6 @@
 import { Router } from "express";
-import {getItemDetails , createInventory} from "../controllers/inventoryController.js";
-import { imageUpload , imageDelete } from "../controllers/imageController.js";
+import {getItemDetails , createInventory , updateInventory , deleteInventory} from "../controllers/inventoryController.js";
+import {getInventoriesByCategory , createCategory , getCategories} from "../controllers/categoryController.js";
 import { verifyTokenAdmin } from "../middlewares/requireAuth.js";
 
 const inventoryRouter = Router();
@@ -8,7 +8,10 @@ inventoryRouter.use(verifyTokenAdmin);
 
 inventoryRouter.get("/", getItemDetails);
 inventoryRouter.post("/", createInventory);
-inventoryRouter.post("/image", imageUpload);
-inventoryRouter.delete("/image/:fileId", imageDelete);
+inventoryRouter.put("/:id", updateInventory);
+inventoryRouter.delete("/:id", deleteInventory);
+inventoryRouter.get("/category/:id", getInventoriesByCategory);
+inventoryRouter.post("/category", createCategory);
+inventoryRouter.get("/category" , getCategories)
 
 export default inventoryRouter;
