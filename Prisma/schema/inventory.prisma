@@ -8,7 +8,7 @@ model Inventory{
     warehouseLocation String
     quantityType String
     alarm Int
-    image Image[]
+    image Image?
     catgoryId String
     category Category @relation("CategoryToInventory" , fields: [catgoryId], references: [id] , onDelete: Cascade)
 }
