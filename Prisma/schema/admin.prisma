@@ -1,9 +1,0 @@
-model admin{
-    id String @id @default(uuid())
-    firstName String
-    lastName String
-    email String @unique
-    password String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}

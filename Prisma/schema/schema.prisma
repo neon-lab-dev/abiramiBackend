@@ -4,7 +4,6 @@ datasource db {
 }
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["prismaSchemaFolder"]
 }
 
 enum status{
@@ -34,6 +33,115 @@ model Client{
     state String
     country String
     status status
+    createdAt DateTime @default(now())
+    updataedAt DateTime @updatedAt
+
+    @@index([mobileNum])
+    @@index([addressLine1])
+}
+
+model admin{
+    id String @id @default(uuid())
+    firstName String
+    lastName String
+    email String @unique
+    password String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Inventory{
+    id String @id @default(uuid())
+    refrence String
+    buyingCost Int
+    quantity Int
+    description String
+    sellingCost Int
+    warehouseLocation String
+    quantityType String
+    alarm Int
+    image Image?
+    catgoryId String
+    category Category @relation("CategoryToInventory" , fields: [catgoryId], references: [id] , onDelete: Cascade)
+}
+
+model Image{
+    fileId String @id
+    name String
+    url String
+    thumbnailUrl String
+    inventoryId String @unique
+    inventory Inventory @relation(fields: [inventoryId], references: [id] , onDelete: Cascade)
+}
+
+model Category{
+    id String @id @default(uuid())
+    name String
+    inventory Inventory[] @relation("CategoryToInventory")
+}
+
+
+model BillingDetails{
+    id String @id @default(uuid())
+    client String
+    date String
+    state String
+    code Int
+    billingStatus String
+    taxType String
+    invoiceType String
+    productDetails ProductDetails[] @relation("ProductToDetails")
+
+    @@index([id])
+    @@index([invoiceType])
+}
+
+
+model ProductDetails{
+    id String @id @default(uuid())
+    description String
+    HSNno Int
+    quantity Int
+    rate Int
+    discount Int
+    amount Int
+    subTotal Int
+    pfAmount Int
+    taxIgst Int
+    roundOff Int
+    total Int
+    billingDetailsId String
+    billingDetails BillingDetails @relation("ProductToDetails" , fields: [billingDetailsId], references: [id] , onDelete: Cascade)
+}
+
+model Purchase{
+    id String @id @default(uuid())
+    companyName String
+    invoiceNumber Int
+    date String
+    totalPurchaseAmt Int
+    gstNum Int
+    status String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Supplier{
+    id String @id @default(uuid())
+    companyName String
+    title String
+    GST String
+    mobileNum String
+    landLineNum String?
+    email String @unique
+    addressLine1 String
+    addressLine2 String?
+    addressLine3 String?
+    city String
+    pincode Int
+    state String
+    country String
+    status String
     createdAt DateTime @default(now())
     updataedAt DateTime @updatedAt
 
