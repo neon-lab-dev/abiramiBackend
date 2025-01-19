@@ -12,7 +12,7 @@ const app = express();
 app.use(
     bodyParser.urlencoded({ limit: ENV_CONFIG.MAX_REQUEST_SIZE, extended: true })
 );
-app.use(cors({ origin: ENV_CONFIG.FRONTEND_URL, credentials: true }));
+app.use(cors({ origin: [ENV_CONFIG.FRONTEND_URL , ENV_CONFIG.FRONTEND_DOMAIN], credentials: true }));
 
 app.use(express.json());
 

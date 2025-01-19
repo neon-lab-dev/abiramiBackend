@@ -19,6 +19,12 @@ const ENV_CONFIG = createEnv({
         type: "array",
         isUrl: true,
     },
+    FRONTEND_DOMAIN: {
+        value: process.env.FRONTEND_DOMAIN,
+        required: true,
+        type: "array",
+        isUrl: true,
+    },
     NODE_ENV: {
         value: process.env.NODE_ENV || "development",
         required: false,
