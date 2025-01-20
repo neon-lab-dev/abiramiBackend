@@ -12,7 +12,27 @@ const app = express();
 app.use(
     bodyParser.urlencoded({ limit: ENV_CONFIG.MAX_REQUEST_SIZE, extended: true })
 );
-app.use(cors({ origin: [ENV_CONFIG.FRONTEND_URL , ENV_CONFIG.FRONTEND_DOMAIN], credentials: true }));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
+
+const allowedOrigins = [ENV_CONFIG.FRONTEND_URL, ENV_CONFIG.FRONTEND_DOMAIN];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(express.json());
 

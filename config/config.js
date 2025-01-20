@@ -16,13 +16,13 @@ const ENV_CONFIG = createEnv({
     FRONTEND_URL: {
         value: process.env.FRONTEND_URL,
         required: true,
-        type: "array",
+        type: "string",
         isUrl: true,
     },
     FRONTEND_DOMAIN: {
         value: process.env.FRONTEND_DOMAIN,
         required: true,
-        type: "array",
+        type: "string",
         isUrl: true,
     },
     NODE_ENV: {
