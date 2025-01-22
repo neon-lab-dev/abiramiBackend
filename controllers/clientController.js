@@ -235,3 +235,42 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
     });
   }
 });
+
+// Get single client
+export const getSingleClient = catchAsyncErrors(async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Client ID is required",
+      });
+    }
+
+    const client = await prismadb.client.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!client) {
+      return sendResponse(res, {
+        status: 404,
+        error: "Client not found",
+      });
+    }
+
+    return sendResponse(res, {
+      status: 200,
+      data: client,
+    });
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
+
