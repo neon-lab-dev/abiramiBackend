@@ -17,9 +17,10 @@ enum billingStatus{
     DRAFT
 }
 
+// client model
 model Client{
     id String @id @default(uuid())
-    companyName String
+    companyName String @unique
     contactPerson String
     GST String
     mobileNum String
@@ -35,11 +36,13 @@ model Client{
     status status
     createdAt DateTime @default(now())
     updataedAt DateTime @updatedAt
+    invoice BillingDetails[] @relation("clientToInvoice")
 
     @@index([mobileNum])
     @@index([addressLine1])
 }
 
+// admin model
 model admin{
     id String @id @default(uuid())
     firstName String
@@ -49,6 +52,8 @@ model admin{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+// inventory model
 
 model Inventory{
     id String @id @default(uuid())
@@ -80,10 +85,10 @@ model Category{
     inventory Inventory[] @relation("CategoryToInventory")
 }
 
-
+// invoice model
 model BillingDetails{
     id String @id @default(uuid())
-    client String
+    clientName String
     date String
     state String
     code Int
@@ -91,6 +96,8 @@ model BillingDetails{
     taxType String
     invoiceType String
     productDetails ProductDetails[] @relation("ProductToDetails")
+    client Client @relation("clientToInvoice",fields: [clientName], references: [companyName] , onDelete: Cascade)
+
 
     @@index([id])
     @@index([invoiceType])
@@ -114,6 +121,7 @@ model ProductDetails{
     billingDetails BillingDetails @relation("ProductToDetails" , fields: [billingDetailsId], references: [id] , onDelete: Cascade)
 }
 
+// purchase model
 model Purchase{
     id String @id @default(uuid())
     companyName String
@@ -125,6 +133,8 @@ model Purchase{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+// supplier model
 
 model Supplier{
     id String @id @default(uuid())

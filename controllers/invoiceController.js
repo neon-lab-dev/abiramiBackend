@@ -43,13 +43,48 @@ export const getAllInvoices = catchAsyncErrors(async (req, res) => {
   }
 });
 
+// get single invoice
+export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+      return sendResponse(res, {
+        status: 400,
+        error: "invoice Id is required",
+      });
+    }
+
+    const invoice = await prismadb.BillingDetails.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        productDetails: true,
+        client: true
+      },
+    });
+
+    if (!invoice) {
+      return sendResponse(res, {
+        status: 404,
+        error: "invoice not found",
+      });
+    }
+
+    return sendResponse(res, {
+      status: 200,
+      data: invoice,
+    });
+  } 
+);
+
 // create invoice
 export const createInvoice = catchAsyncErrors(async (req, res) => {
   try {
-    const { client , date , state , code , billingStatus , taxType , invoiceType , productDetails } = req.body;
+    const { clientName , date , state , code , billingStatus , taxType , invoiceType , productDetails } = req.body;
 
     // error handling
-    if (!client || !date || !state || !code || !billingStatus || !taxType || !invoiceType || !productDetails) {
+    if (!clientName || !date || !state || !code || !billingStatus || !taxType || !invoiceType || !productDetails) {
       return sendResponse(res, {
         status: 400,
         error: "Please fill the required fields",
@@ -58,7 +93,7 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
 
     const existingInvoice = await prismadb.BillingDetails.findFirst({
       where: {
-        AND: [{ client }, { billingStatus } , {invoiceType}],
+        AND: [{ clientName }, { billingStatus } , {invoiceType}],
       },
     });
 
@@ -71,7 +106,7 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
 
     const invoice = await prismadb.BillingDetails.create({
       data: {
-        client,
+        clientName,
         date,
         state,
         code,
@@ -96,6 +131,62 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
     });
   }
 });
+
+// create invoice by clientName
+export const createInvoiceByClientName = catchAsyncErrors(async (req, res) => {
+      const { clientName } = req.params;
+
+      if(!clientName) {
+        return sendResponse(res, {
+          status: 400,
+          error: "Client Name is required",
+        });
+      }
+
+      const { date , state , code , billingStatus , taxType , invoiceType , productDetails } = req.body;
+  
+      // error handling
+      if ( !date || !state || !code || !billingStatus || !taxType || !invoiceType || !productDetails) {
+        return sendResponse(res, {
+          status: 400,
+          error: "Please fill the required fields",
+        });
+      }
+  
+      const existingInvoice = await prismadb.BillingDetails.findFirst({
+        where: {
+          AND: [{ clientName: clientName }, { billingStatus } , {invoiceType}],
+        },
+      });
+  
+      if (existingInvoice) {
+        return sendResponse(res, {
+          status: 400,
+          error: "Invoice already exists",
+        });
+      }
+  
+      const invoice = await prismadb.BillingDetails.create({
+        data: {
+          clientName: clientName,
+          date,
+          state,
+          code,
+          billingStatus,
+          taxType,
+          invoiceType,
+          productDetails: {
+              create: productDetails
+          }
+        },
+      });
+  
+      return sendResponse(res, {
+        status: 200,
+        data: invoice,
+        productDetails: productDetails
+      });
+    });
 
 
 // delete invoice

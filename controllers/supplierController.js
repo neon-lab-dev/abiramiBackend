@@ -34,6 +34,36 @@ export const getAllSuppliers = catchAsyncErrors(async (req, res) => {
   }
 });
 
+// get single supplier
+export const getSingleSupplier = catchAsyncErrors(async (req, res) => {
+      const { id } = req.params;
+  
+      if (!id) {
+        return sendResponse(res, {
+          status: 400,
+          error: "supplier Id is required",
+        });
+      }
+  
+      const supplier = await prismadb.supplier.findUnique({
+        where: {
+          id,
+        },
+      });
+  
+      if (!supplier) {
+        return sendResponse(res, {
+          status: 404,
+          error: "supplier not found",
+        });
+      }
+  
+      return sendResponse(res, {
+        status: 200,
+        data: supplier,
+      });
+    });
+
 // create supplier
 export const createSupplier = catchAsyncErrors(async (req, res) => {
     try {

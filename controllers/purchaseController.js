@@ -34,6 +34,36 @@ export const getALLPurchases= catchAsyncErrors(async (req, res)=>{
     });
 })
 
+// get single purchase
+export const getSinglePurchase= catchAsyncErrors(async (req, res)=>{
+    const {id}= req.params;
+
+    if(!id){
+        return sendResponse(res, {
+            status: 400,
+            error: "Purchase Id is required",
+        });
+    }
+
+    const purchase = await prismadb.Purchase.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if(!purchase){
+        return sendResponse(res, {
+            status: 404,
+            error: "Purchase not found",
+        });
+    }
+
+    return sendResponse(res, {
+        status: 200,
+        data: purchase,
+    });
+})
+
 // create purchase
 export const createPurchase= catchAsyncErrors(async (req, res)=>{
     const {companyName , invoiceNumber , date ,totalPurchaseAmt , gstNum , status}= req.body;

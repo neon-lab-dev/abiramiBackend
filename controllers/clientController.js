@@ -13,7 +13,11 @@ export const getAllClients = catchAsyncErrors(async (req, res) => {
       status: "ACTIVE"
     }
 
-    const clients = await prismadb.client.findMany();
+    const clients = await prismadb.client.findMany(
+     { include:{
+        invoice:true
+      }}
+    );
     const totalCount = await prismadb.client.count();
     const activeCount = await prismadb.client.count({
       where: wehreClause
@@ -39,12 +43,12 @@ export const createClient = catchAsyncErrors(async (req, res) => {
   try {
     const {
       companyName, contactPerson, GST, mobileNum, landLineNum, email, addressLine1,
-      addressLine2, addressLine3, city, pincode, state, country, status,
+      addressLine2, addressLine3, city, pincode, state, country, status
     } = req.body;
 
     // error handling
     if (
-      !companyName || !contactPerson || !GST || !mobileNum || !addressLine1 || !city || !pincode || !state || !country|| !status
+      !companyName || !contactPerson || !GST || !mobileNum || !addressLine1 || !city || !pincode || !state || !country|| !status 
     ) {
       return sendResponse(res, {
         status: 400,
@@ -189,62 +193,68 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
 
 // get client by mobile number and address
 export const searchClients = catchAsyncErrors(async (req, res) => {
-  try {
     const { mobileNum, address } = req.query;
 
     const whereClause = {
       OR: [
-        mobileNum && {
-          mobileNum: {
-            contains: mobileNum
-          }
-        },
-        address && {
+        mobileNum ? { mobileNum: { contains: mobileNum } } : undefined,
+        address ? {
           OR: [
             { addressLine1: { contains: address } },
           ]
-        }
+        } : undefined
       ].filter(Boolean)
     };
 
     const clients = await prismadb.client.findMany({
       where: whereClause,
+      include: {
+        invoice: true // Include the invoice relation
+      }
     });
+
+    if(clients.length === 0){
+      return sendResponse(res, {
+        status: 404,
+        error: "No clients found",
+      });
+    }
+
+    // Ensure that clients with null invoices are handled
+    const clientsWithInvoices = clients.map(client => ({
+      ...client,
+      invoice: client.invoice || [] // If invoice is null, set it to an empty array
+    }));
+
     const totalCount = await prismadb.client.count({
-      where: whereClause
+      where: whereClause,
     });
+
     const activeCount = await prismadb.client.count({
       where: {
         AND: [whereClause, { status: "ACTIVE" }]
-      }
+      },
     });
+
     const inactiveCount = totalCount - activeCount;
 
     return sendResponse(res, {
       status: 200,
-      data: clients,
+      data: clientsWithInvoices, // Use the modified clients array
       totalCount: totalCount,
       activeCount: activeCount,
       inactiveCount: inactiveCount
     });
-
-  } catch (error) {
-    return sendResponse(res, {
-      status: 500,
-      error: error.message
-    });
-  }
 });
 
 // Get single client
 export const getSingleClient = catchAsyncErrors(async (req, res) => {
-  try {
     const { id } = req.params;
 
     if (!id) {
       return sendResponse(res, {
         status: 400,
-        error: "Client ID is required",
+        error: "Client Id is required",
       });
     }
 
@@ -252,7 +262,21 @@ export const getSingleClient = catchAsyncErrors(async (req, res) => {
       where: {
         id,
       },
+      include: {
+        invoice: true,
+      },
     });
+
+    if(!client){
+      return sendResponse(res, {
+        status: 404,
+        error: "no, client not found",
+      });
+    }
+
+    const totalInvoices = client.invoice.length;
+    const paidInvoices = client.invoice.filter(inv => inv.billingStatus === "PAID").length;
+    const pendingInvoices = client.invoice.filter(inv => inv.billingStatus === "PENDING").length;
 
     if (!client) {
       return sendResponse(res, {
@@ -264,13 +288,8 @@ export const getSingleClient = catchAsyncErrors(async (req, res) => {
     return sendResponse(res, {
       status: 200,
       data: client,
+      totalInvoices: totalInvoices,
+      paidInvoices: paidInvoices,
+      pendingInvoices: pendingInvoices
     });
-  } catch (error) {
-    return sendResponse(res, {
-      status: 500,
-      error: error.message,
-    });
-  }
 });
-
-

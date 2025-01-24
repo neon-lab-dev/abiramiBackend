@@ -51,6 +51,36 @@ export const getItemDetails = catchAsyncErrors(async (req, res) => {
   }
 });
 
+// get single inventory
+export const getSingleInventory = catchAsyncErrors(async (req, res) => {
+      const { id } = req.params;
+      if (!id) {
+        return sendResponse(res, {
+          status: 400,
+          error: "Inventory Id is required",
+        });
+      }
+  
+      const inventory = await prismadb.Inventory.findUnique({
+        where: {
+          id,
+        },
+      });
+  
+      if (!inventory) {
+        return sendResponse(res, {
+          status: 404,
+          error: "Inventory not found",
+        });
+      }
+  
+      return sendResponse(res, {
+        status: 200,
+        data: inventory,
+      });
+  })
+
+
 // create inventory
 export const createInventory = catchAsyncErrors(async (req, res) => {
     try {
