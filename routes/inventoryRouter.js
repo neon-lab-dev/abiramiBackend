@@ -9,11 +9,11 @@ inventoryRouter.use(verifyTokenAdmin);
 
 inventoryRouter.get("/", getItemDetails);
 inventoryRouter.post("/", singleUpload ,createInventory);
+inventoryRouter.get("/category" , getCategories);
 inventoryRouter.get("/:id", getSingleInventory);
 inventoryRouter.put("/:id", updateInventory);
 inventoryRouter.delete("/:id", deleteInventory);
 inventoryRouter.get("/category/:id", getInventoriesByCategory);
 inventoryRouter.post("/category", createCategory);
-inventoryRouter.get("/category" , getCategories);
 
 export default inventoryRouter;
