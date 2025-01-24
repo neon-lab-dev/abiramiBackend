@@ -81,10 +81,10 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
 // create invoice
 export const createInvoice = catchAsyncErrors(async (req, res) => {
   try {
-    const { clientName , date , state , code , billingStatus , taxType , invoiceType , productDetails } = req.body;
+    const { clientName , date , state , code , billingStatus , taxType ,totalAmount ,taxGST, invoiceType , productDetails } = req.body;
 
     // error handling
-    if (!clientName || !date || !state || !code || !billingStatus || !taxType || !invoiceType || !productDetails) {
+    if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST || !invoiceType || !productDetails) {
       return sendResponse(res, {
         status: 400,
         error: "Please fill the required fields",
@@ -112,6 +112,8 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
         code,
         billingStatus,
         taxType,
+        totalAmount,
+        taxGST,
         invoiceType,
         productDetails: {
             create: productDetails

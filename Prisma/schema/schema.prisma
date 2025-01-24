@@ -35,7 +35,7 @@ model Client{
     country String
     status status
     createdAt DateTime @default(now())
-    updataedAt DateTime @updatedAt
+    updataedAt DateTime @updatedAt 
     invoice BillingDetails[] @relation("clientToInvoice")
 
     @@index([mobileNum])
@@ -66,6 +66,9 @@ model Inventory{
     quantityType String
     alarm Int
     image Image?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
+
     catgoryId String
     category Category @relation("CategoryToInventory" , fields: [catgoryId], references: [id] , onDelete: Cascade)
 }
@@ -83,6 +86,8 @@ model Category{
     id String @id @default(uuid())
     name String
     inventory Inventory[] @relation("CategoryToInventory")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
 }
 
 // invoice model
@@ -95,7 +100,11 @@ model BillingDetails{
     billingStatus String
     taxType String
     invoiceType String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
     productDetails ProductDetails[] @relation("ProductToDetails")
+    totalAmount Float?
+    taxGST Float?
     client Client @relation("clientToInvoice",fields: [clientName], references: [companyName] , onDelete: Cascade)
 
 
@@ -114,9 +123,9 @@ model ProductDetails{
     amount Int
     subTotal Int
     pfAmount Int
-    taxIgst Int
     roundOff Int
-    total Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
     billingDetailsId String
     billingDetails BillingDetails @relation("ProductToDetails" , fields: [billingDetailsId], references: [id] , onDelete: Cascade)
 }
