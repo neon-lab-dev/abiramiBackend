@@ -105,6 +105,10 @@ model BillingDetails{
     productDetails ProductDetails[] @relation("ProductToDetails")
     totalAmount Float?
     taxGST Float?
+    subTotal Float?
+    pfAmount Float?
+    discount Float?
+    roundOff Float?
     client Client @relation("clientToInvoice",fields: [clientName], references: [companyName] , onDelete: Cascade)
 
 
@@ -119,11 +123,7 @@ model ProductDetails{
     HSNno Int
     quantity Int
     rate Int
-    discount Int
     amount Int
-    subTotal Int
-    pfAmount Int
-    roundOff Int
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt @default(now())
     billingDetailsId String
