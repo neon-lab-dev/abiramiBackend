@@ -81,26 +81,13 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
 // create invoice
 export const createInvoice = catchAsyncErrors(async (req, res) => {
   try {
-    const { clientName , date , state , code , billingStatus , taxType ,totalAmount ,subTotal ,pfAmount, discount, roundOff, taxGST, invoiceType , productDetails } = req.body;
+    const { clientName , date , state , code , billingStatus , taxType ,totalAmount ,subTotal ,pfAmount, roundOff, taxGST, invoiceType , productDetails } = req.body;
 
     // error handling
-    if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount || !discount ||!roundOff|| !invoiceType || !productDetails) {
+    if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType || !productDetails) {
       return sendResponse(res, {
         status: 400,
         error: "Please fill the required fields",
-      });
-    }
-
-    const existingInvoice = await prismadb.BillingDetails.findFirst({
-      where: {
-        AND: [{ clientName }, { billingStatus } , {invoiceType}],
-      },
-    });
-
-    if (existingInvoice) {
-      return sendResponse(res, {
-        status: 400,
-        error: "Invoice already exists",
       });
     }
 
@@ -115,7 +102,6 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
         totalAmount,
         subTotal,
         pfAmount,
-        discount,
         roundOff,
         taxGST,
         invoiceType,
