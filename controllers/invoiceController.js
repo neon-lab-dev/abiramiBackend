@@ -81,7 +81,27 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
 // create invoice
 export const createInvoice = catchAsyncErrors(async (req, res) => {
   try {
-    const { clientName , date , state , code , billingStatus , taxType ,totalAmount ,subTotal ,pfAmount, roundOff, taxGST, invoiceType , productDetails } = req.body;
+    const { clientName ,
+       date ,
+       state ,
+       code ,
+       billingStatus ,
+       taxType ,
+      totalAmount ,
+      subTotal ,
+      pfAmount,
+       roundOff, 
+      taxGST, 
+      invoiceType , 
+      bankName,
+      chequeNumber,
+      chequeAmount,
+      transport,
+      placeOfSupply,
+      poNO,
+      vehicleNo,
+      productDetails,
+    } = req.body;
 
     // error handling
     if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType || !productDetails) {
@@ -89,6 +109,18 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
         status: 400,
         error: "Please fill the required fields",
       });
+    }
+    if(!bankName && !chequeNumber && !chequeAmount) {
+      bankName = null;
+      chequeNumber = null;
+      chequeAmount = null;
+    }
+
+    if(!transport && !placeOfSupply && !poNO && !vehicleNo) {
+      transport = null;
+      placeOfSupply = null;
+      poNO = null;
+      vehicleNo = null;
     }
 
     const invoice = await prismadb.BillingDetails.create({
@@ -105,6 +137,13 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
         roundOff,
         taxGST,
         invoiceType,
+        bankName,
+        chequeNumber,
+        chequeAmount,
+        transport,
+        placeOfSupply,
+        poNO,
+        vehicleNo,
         productDetails: {
             create: productDetails
       }
@@ -135,7 +174,27 @@ export const createInvoiceByClientName = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      const { date , state , code , billingStatus , taxType , invoiceType , productDetails } = req.body;
+      const {  
+        date ,
+        state ,
+        code ,
+        billingStatus ,
+        taxType ,
+       totalAmount ,
+       subTotal ,
+       pfAmount,
+        roundOff, 
+       taxGST, 
+       invoiceType , 
+       bankName,
+       chequeNumber,
+       chequeAmount,
+       transport,
+       placeOfSupply,
+       poNO,
+       vehicleNo,
+       productDetails,
+     } = req.body;
   
       // error handling
       if ( !date || !state || !code || !billingStatus || !taxType || !invoiceType || !productDetails) {
@@ -143,6 +202,18 @@ export const createInvoiceByClientName = catchAsyncErrors(async (req, res) => {
           status: 400,
           error: "Please fill the required fields",
         });
+      }
+      if(!bankName && !chequeNumber && !chequeAmount) {
+        bankName = null;
+        chequeNumber = null;
+        chequeAmount = null;
+      }
+  
+      if(!transport && !placeOfSupply && !poNO && !vehicleNo) {
+        transport = null;
+        placeOfSupply = null;
+        poNO = null;
+        vehicleNo = null;
       }
   
       const existingInvoice = await prismadb.BillingDetails.findFirst({
@@ -166,10 +237,22 @@ export const createInvoiceByClientName = catchAsyncErrors(async (req, res) => {
           code,
           billingStatus,
           taxType,
+          totalAmount,
+          subTotal,
+          pfAmount,
+          roundOff,
+          taxGST,
           invoiceType,
+          bankName,
+          chequeNumber,
+          chequeAmount,
+          transport,
+          placeOfSupply,
+          poNO,
+          vehicleNo,
           productDetails: {
               create: productDetails
-          }
+        }
         },
       });
   
@@ -232,7 +315,7 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
     }
 
     const {
-        client , date , state , code , billingStatus , taxType , invoiceType , productDetails
+        client , date , state , code , billingStatus , totalAmount , taxGST, taxType , invoiceType , productDetails
     } = req.body;
 
     const invoice = await prismadb.BillingDetails.update({
@@ -245,6 +328,8 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
         state,
         code,
         billingStatus,
+        totalAmount,
+        taxGST,
         taxType,
         invoiceType,
         productDetails: {

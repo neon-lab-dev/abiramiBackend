@@ -100,6 +100,13 @@ model BillingDetails{
     billingStatus String
     taxType String
     invoiceType String
+    bankName String?
+    chequeNumber Float?
+    chequeAmount Float?
+    transport String?
+    placeOfSupply String?
+    poNO Int?
+    vehicleNo Int?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt @default(now())
     productDetails ProductDetails[] @relation("ProductToDetails")
