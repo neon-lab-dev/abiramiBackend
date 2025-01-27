@@ -81,7 +81,7 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
 // create invoice
 export const createInvoice = catchAsyncErrors(async (req, res) => {
   try {
-    const { clientName ,
+    let { clientName ,
        date ,
        state ,
        code ,

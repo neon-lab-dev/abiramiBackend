@@ -101,7 +101,7 @@ model BillingDetails{
     taxType String
     invoiceType String
     bankName String?
-    chequeNumber Float?
+    chequeNumber String?
     chequeAmount Float?
     transport String?
     placeOfSupply String?
