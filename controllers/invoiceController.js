@@ -174,7 +174,7 @@ export const createInvoiceByClientName = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      const {  
+      let {  
         date ,
         state ,
         code ,
