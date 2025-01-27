@@ -105,8 +105,8 @@ model BillingDetails{
     chequeAmount Float?
     transport String?
     placeOfSupply String?
-    poNO Int?
-    vehicleNo Int?
+    poNO String?
+    vehicleNo String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt @default(now())
     productDetails ProductDetails[] @relation("ProductToDetails")
@@ -126,7 +126,7 @@ model BillingDetails{
 model ProductDetails{
     id String @id @default(uuid())
     description String
-    HSNno Int
+    HSNno String
     quantity Int
     rate Int
     amount Int
