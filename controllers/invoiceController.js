@@ -314,27 +314,75 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
       });
     }
 
-    const {
-        client , date , state , code , billingStatus , totalAmount , taxGST, taxType , invoiceType , productDetails
-    } = req.body;
+    let { clientName ,
+      date ,
+      state ,
+      code ,
+      billingStatus ,
+      taxType ,
+     totalAmount ,
+     subTotal ,
+     pfAmount,
+      roundOff, 
+     taxGST, 
+     invoiceType , 
+     bankName,
+     chequeNumber,
+     chequeAmount,
+     transport,
+     placeOfSupply,
+     poNO,
+     vehicleNo,
+     productDetails,
+   } = req.body;
+
+   // error handling
+   if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType || !productDetails) {
+     return sendResponse(res, {
+       status: 400,
+       error: "Please fill the required fields",
+     });
+   }
+   if(!bankName && !chequeNumber && !chequeAmount) {
+     bankName = null;
+     chequeNumber = null;
+     chequeAmount = null;
+   }
+
+   if(!transport && !placeOfSupply && !poNO && !vehicleNo) {
+     transport = null;
+     placeOfSupply = null;
+     poNO = null;
+     vehicleNo = null;
+   }
 
     const invoice = await prismadb.BillingDetails.update({
       where: {
         id,
       },
       data: {
-        client,
+        clientName,
         date,
         state,
         code,
         billingStatus,
-        totalAmount,
-        taxGST,
         taxType,
+        totalAmount,
+        subTotal,
+        pfAmount,
+        roundOff,
+        taxGST,
         invoiceType,
+        bankName,
+        chequeNumber,
+        chequeAmount,
+        transport,
+        placeOfSupply,
+        poNO,
+        vehicleNo,
         productDetails: {
             create: productDetails
-        }
+      }
       },
     });
 
