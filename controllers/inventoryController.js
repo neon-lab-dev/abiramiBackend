@@ -51,6 +51,29 @@ export const getItemDetails = catchAsyncErrors(async (req, res) => {
   }
 });
 
+// get inventories
+export const getInventories= catchAsyncErrors(async (req, res) => {
+    try {
+      const inventories = await prismadb.Inventory.findMany(
+        {include: {
+          image: true
+        }}
+      );
+
+      return sendResponse(res, {
+        status: 200,
+        data: inventories,
+      });
+    } catch (error) {
+      return sendResponse(res, {
+        status: 500,
+        error: error.message,
+      });
+    }
+});
+
+      
+
 // get single inventory
 export const getSingleInventory = catchAsyncErrors(async (req, res) => {
       const { id } = req.params;
@@ -65,6 +88,9 @@ export const getSingleInventory = catchAsyncErrors(async (req, res) => {
         where: {
           id,
         },
+        include:{
+          image:true
+        }
       });
   
       if (!inventory) {
@@ -152,6 +178,7 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
       return sendResponse(res, {
         status: 200,
         data: inventory,
+        image: image
       });
     } catch (error) {
       return sendResponse(res, {

@@ -10,7 +10,11 @@ export const getCategories = catchAsyncErrors(async (req, res) => {
     const categories = await prismadb.Category.findMany(
         {
             include: {
-                inventory: true
+                inventory: {
+                  include: {
+                    image: true
+                  }
+                }
             }
         }
     );
@@ -37,7 +41,11 @@ export const getInventoriesByCategory = catchAsyncErrors(async (req, res) => {
         id: id
       },
       include: {
-        inventory: true
+        inventory:{
+          include: {
+            image: true
+          }
+        }
       }
     });
 
