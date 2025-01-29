@@ -337,12 +337,21 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
    } = req.body;
 
    // error handling
-   if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType || !productDetails) {
+   if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType ) {
      return sendResponse(res, {
        status: 400,
        error: "Please fill the required fields",
      });
    }
+
+   if(!productDetails){
+      return sendResponse(res, {
+        status: 400,
+        error: "Please fill the productDetails fields",
+   });
+  }
+
+
    if(!bankName && !chequeNumber && !chequeAmount) {
      bankName = null;
      chequeNumber = null;
@@ -381,8 +390,11 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
         poNO,
         vehicleNo,
         productDetails: {
-            create: productDetails
-      }
+          updateMany: productDetails.map((product) => ({
+            where: { id: product.id },
+            data: { ...product },
+          })),
+        }
       },
     });
 

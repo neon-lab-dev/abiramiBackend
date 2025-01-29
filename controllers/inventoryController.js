@@ -200,13 +200,33 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      const { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId } = req.body;
+      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId  } = req.body;
   
       // error handling
-      if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
+      if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId
+      ) {
         return sendResponse(res, {
           status: 400,
           error: "Please fill the required fields",
+        });
+      }
+
+      if(!req.file){
+        return sendResponse(res, {
+          status: 400,
+          error: "Please upload an image file",
+        });
+      }
+
+       const image = await uploadImage(
+        getDataUri(req.file).content,
+        getDataUri(req.file).fileName,
+        "inventory"
+      );
+      if (!image) {
+        return sendResponse({
+          res: 500,
+          error: "Failed to upload image."
         });
       }
   
@@ -216,20 +236,29 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         },
         data: {
             refrence ,
-            buyingCost , 
-            quantity , 
+            buyingCost: parseInt(buyingCost) , 
+            quantity: parseInt(quantity) , 
             description , 
-            sellingCost , 
+            sellingCost: parseInt(sellingCost) , 
             warehouseLocation , 
             quantityType , 
-            alarm , 
-            catgoryId
+            alarm:parseInt(alarm) , 
+            catgoryId,
+            image: {
+              update: {
+                fileId: image.fileId,
+                name: image.name,
+                url: image.url,
+                thumbnailUrl: image.thumbnailUrl,
+            }
         },
-      });
+      }
+    });
   
       return sendResponse(res, {
         status: 200,
         data: inventory,
+        image: image
       });
     } catch (error) {
       return sendResponse(res, {
