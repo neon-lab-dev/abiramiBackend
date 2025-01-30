@@ -200,7 +200,7 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId  } = req.body;
+      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId , image  } = req.body;
   
       // error handling
       if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId
@@ -211,14 +211,8 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      if(!req.file){
-        return sendResponse(res, {
-          status: 400,
-          error: "Please upload an image file",
-        });
-      }
-
-       const image = await uploadImage(
+      if(req.file){
+        image = await uploadImage(
         getDataUri(req.file).content,
         getDataUri(req.file).fileName,
         "inventory"
@@ -229,6 +223,8 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
           error: "Failed to upload image."
         });
       }
+      }
+
   
       const inventory = await prismadb.Inventory.update({
         where: {
