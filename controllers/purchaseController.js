@@ -75,6 +75,19 @@ export const createPurchase= catchAsyncErrors(async (req, res)=>{
         });
     }
 
+    const existingPurchase = await prismadb.Purchase.findFirst({
+        where: {
+          AND: [ { invoiceNumber } , {totalPurchaseAmt}],
+        },
+    });
+      
+      if (existingPurchase) {
+        return sendResponse(res, {
+          status: 400,
+          error: "Purchase already exists",
+        });
+      }
+
     const purchase = await prismadb.Purchase.create({
         data: {
             companyName,
