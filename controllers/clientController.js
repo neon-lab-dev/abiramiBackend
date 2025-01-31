@@ -277,6 +277,7 @@ export const getSingleClient = catchAsyncErrors(async (req, res) => {
     const totalInvoices = client.invoice.length;
     const paidInvoices = client.invoice.filter(inv => inv.billingStatus === "PAID").length;
     const pendingInvoices = client.invoice.filter(inv => inv.billingStatus === "PENDING").length;
+    const totalIncome  = client.invoice.reduce((acc, inv) => acc + inv.totalAmount, 0);
 
     if (!client) {
       return sendResponse(res, {
@@ -288,6 +289,7 @@ export const getSingleClient = catchAsyncErrors(async (req, res) => {
     return sendResponse(res, {
       status: 200,
       data: client,
+      totalIncome: totalIncome,
       totalInvoices: totalInvoices,
       paidInvoices: paidInvoices,
       pendingInvoices: pendingInvoices

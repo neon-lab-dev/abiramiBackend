@@ -333,7 +333,7 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
      placeOfSupply,
      poNO,
      vehicleNo,
-     productDetails,
+     productDetails
    } = req.body;
 
    // error handling
@@ -343,13 +343,6 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
        error: "Please fill the required fields",
      });
    }
-
-   if(!productDetails){
-      return sendResponse(res, {
-        status: 400,
-        error: "Please fill the productDetails fields",
-   });
-  }
 
 
    if(!bankName && !chequeNumber && !chequeAmount) {
@@ -365,43 +358,59 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
      vehicleNo = null;
    }
 
-    const invoice = await prismadb.BillingDetails.update({
-      where: {
-        id,
-      },
-      data: {
-        clientName,
-        date,
-        state,
-        code,
-        billingStatus,
-        taxType,
-        totalAmount,
-        subTotal,
-        pfAmount,
-        roundOff,
-        taxGST,
-        invoiceType,
-        bankName,
-        chequeNumber,
-        chequeAmount,
-        transport,
-        placeOfSupply,
-        poNO,
-        vehicleNo,
-        productDetails: {
-          updateMany: productDetails.map((product) => ({
-            where: { id: product.id },
-            data: { ...product },
-          })),
-        }
-      },
-    });
 
+   const invoice = await prismadb.BillingDetails.update({
+    where: { id },
+    data: {
+      clientName,
+      date,
+      state,
+      code,
+      billingStatus,
+      taxType,
+      totalAmount,
+      subTotal,
+      pfAmount,
+      roundOff,
+      taxGST,
+      invoiceType,
+      bankName,
+      chequeNumber,
+      chequeAmount,
+      transport,
+      placeOfSupply,
+      poNO,
+      vehicleNo,
+    },
+  });
+
+  // Update product details
+  await Promise.all(productDetails.map(async (product) => {
+    if (product.id) {
+      // Update existing product
+      await prismadb.ProductDetails.update({
+        where: { id: product.id },
+        data: product,
+      });
+    } else {
+      // Create new product
+      await prismadb.ProductDetails.create({
+        data: {
+          ...product,
+          billingDetailsId: id,
+        },
+      });
+    }
+  }));
+
+  // Fetch updated invoice with product details
+  const updatedInvoice = await prismadb.BillingDetails.findUnique({
+    where: { id },
+    include: { productDetails: true },
+  });
     return sendResponse(res, {
       status: 200,
-      data: invoice,
-      productDetails: productDetails
+      data: updatedInvoice,
     });
   } catch (error) {
     return sendResponse(res, {
