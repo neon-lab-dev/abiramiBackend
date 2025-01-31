@@ -358,59 +358,47 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
      vehicleNo = null;
    }
 
-
-   const invoice = await prismadb.BillingDetails.update({
-    where: { id },
-    data: {
-      clientName,
-      date,
-      state,
-      code,
-      billingStatus,
-      taxType,
-      totalAmount,
-      subTotal,
-      pfAmount,
-      roundOff,
-      taxGST,
-      invoiceType,
-      bankName,
-      chequeNumber,
-      chequeAmount,
-      transport,
-      placeOfSupply,
-      poNO,
-      vehicleNo,
-    },
+   // Delete existing product details
+   await prismadb.ProductDetails.deleteMany({
+    where: { billingDetailsId: id }
   });
 
-  // Update product details
-  await Promise.all(productDetails.map(async (product) => {
-    if (product.id) {
-      // Update existing product
-      await prismadb.ProductDetails.update({
-        where: { id: product.id },
-        data: product,
-      });
-    } else {
-      // Create new product
-      await prismadb.ProductDetails.create({
-        data: {
-          ...product,
-          billingDetailsId: id,
-        },
-      });
-    }
-  }));
+     // Update invoice details
+     const invoice = await prismadb.BillingDetails.update({
+      where: { id },
+      data: {
+        clientName,
+        date,
+        state,
+        code,
+        billingStatus,
+        taxType,
+        totalAmount,
+        subTotal,
+        pfAmount,
+        roundOff,
+        taxGST,
+        invoiceType,
+        bankName,
+        chequeNumber,
+        chequeAmount,
+        transport,
+        placeOfSupply,
+        poNO,
+        vehicleNo,
+        productDetails: {
+          create: productDetails
+        }
+      },
+      include: {
+        productDetails: true
+      }
+    });
 
-  // Fetch updated invoice with product details
-  const updatedInvoice = await prismadb.BillingDetails.findUnique({
-    where: { id },
-    include: { productDetails: true },
-  });
+
     return sendResponse(res, {
       status: 200,
-      data: updatedInvoice,
+      data: invoice,
     });
   } catch (error) {
     return sendResponse(res, {
