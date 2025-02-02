@@ -193,25 +193,37 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
 
 // get client by mobile number and address
 export const searchClients = catchAsyncErrors(async (req, res) => {
-    const { mobileNum, address } = req.query;
+  const { mobileNum, address } = req.query;
 
-    const whereClause = {
-      OR: [
-        mobileNum ? { mobileNum: { contains: mobileNum } } : undefined,
-        address ? {
-          OR: [
-            { addressLine1: { contains: address } },
-          ]
-        } : undefined
-      ].filter(Boolean)
-    };
+  const whereClause = {
+    OR: [
+      mobileNum ? { mobileNum: { contains: mobileNum } } : undefined,
+      address ? {
+        OR: [
+          { addressLine1: { contains: address } },
+        ]
+      } : undefined
+    ].filter(Boolean)
+  };
 
-    const clients = await prismadb.client.findMany({
+    const clients = await prismadb.Client.findMany({
       where: whereClause,
       include: {
         invoice: true // Include the invoice relation
       }
-    });
+    }); 
+
+
+//   const clients = await prismadb.$queryRaw`
+//   SELECT * FROM Client 
+//   WHERE 
+//     mobileNum LIKE ${'%' + query + '%'} OR
+//     addressLine1 LIKE ${'%' + query + '%'} OR
+//     companyName LIKE ${'%' + query + '%'} OR
+//     contactPerson LIKE ${'%' + query + '%'} OR
+//     GST LIKE ${'%' + query + '%'} OR
+//     status LIKE ${'%' + query + '%'}
+// `;
 
     if(clients.length === 0){
       return sendResponse(res, {
@@ -226,24 +238,24 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
       invoice: client.invoice || [] // If invoice is null, set it to an empty array
     }));
 
-    const totalCount = await prismadb.client.count({
-      where: whereClause,
-    });
+    // const totalCount = await prismadb.client.count({
+    //   where: whereClause,
+    // });
 
-    const activeCount = await prismadb.client.count({
-      where: {
-        AND: [whereClause, { status: "ACTIVE" }]
-      },
-    });
+    // const activeCount = await prismadb.client.count({
+    //   where: {
+    //     AND: [whereClause, { status: "ACTIVE" }]
+    //   },
+    // });
 
-    const inactiveCount = totalCount - activeCount;
+    // const inactiveCount = totalCount - activeCount;
 
     return sendResponse(res, {
       status: 200,
-      data: clientsWithInvoices, // Use the modified clients array
-      totalCount: totalCount,
-      activeCount: activeCount,
-      inactiveCount: inactiveCount
+      data: clients, // Use the modified clients array
+      // totalCount: totalCount,
+      // activeCount: activeCount,
+      // inactiveCount: inactiveCount
     });
 });
 

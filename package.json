@@ -7,12 +7,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "postinstall": "prisma generate --schema=./Prisma/schema/schema.prisma && prisma migrate deploy --schema=./Prisma/schema/schema.prisma" 
+    "postinstall": "prisma generate --schema=./Prisma/schema/schema.prisma && prisma migrate deploy --schema=./Prisma/schema/schema.prisma"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.1.0",
+    "@prisma/client": "^6.3.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
@@ -27,6 +27,6 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "prisma": "^6.1.0"
+    "prisma": "^6.3.0"
   }
 }
