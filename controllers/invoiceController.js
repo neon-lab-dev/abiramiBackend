@@ -410,30 +410,17 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
 });
 
 
-// get invoice by invoice type and id
+// serach invoices
 export const searchInvoices = catchAsyncErrors(async (req, res) => {
     try {
       const { query } = req.query;
 
-      let companyName = null;
-      let clientName = null;
-    
-      if(!isNaN(query)){
-        totalAmount=query;
-      }else{
-        clientName=query;
-      }
   
       const whereClause = {
         OR: [
-          totalAmount && {
-            totalAmount: {
-              contains: totalAmount
-            }
-          },
-          clientName && {
+          query && {
             OR: [
-              { clientName: { contains: clientName } },
+              { clientName: { contains: query } },
             ]
           }
         ].filter(Boolean)

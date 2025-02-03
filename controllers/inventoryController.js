@@ -301,3 +301,46 @@ export const deleteInventory = catchAsyncErrors(async (req, res) => {
       });
     }
   });
+
+// search inventory
+export const searchInventories = catchAsyncErrors(async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const whereClause = {
+      OR: [
+        query && {
+          OR: [
+            { refrence: { contains: query } }
+          ]
+        }
+      ].filter(Boolean)
+    };
+
+    const Inventories = await prismadb.Inventory.findMany({
+      where: whereClause,
+      include:{
+        image:true
+      }
+    });
+
+    if(Inventories.length === 0){
+      return sendResponse(res, {
+        status: 404,
+        error: "No invoice found",
+      });
+    }
+
+
+    return sendResponse(res, {
+      status: 200,
+      data: Inventories
+    });
+
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message
+    });
+  }
+});

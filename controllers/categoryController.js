@@ -116,3 +116,32 @@ export const createCategory = catchAsyncErrors(async (req, res) => {
     });
   }
 });
+
+// search category
+export const searchCategory = catchAsyncErrors(async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const category = await prismadb.Category.findMany({
+      where: {
+        name: {
+          contains: query,
+        }
+      },
+      include: {
+        inventory: true
+      }
+    });
+
+    return sendResponse(res, {
+      status: 200,
+      data: category
+    });
+
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message
+    });
+  }
+});

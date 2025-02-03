@@ -9,18 +9,18 @@ const emailSchema = z.string().email();
 // get all clients
 export const getAllClients = catchAsyncErrors(async (req, res) => {
   try {
-    const wehreClause={
-      status: "ACTIVE"
-    }
+    const wehreClause = {
+      status: "ACTIVE",
+    };
 
-    const clients = await prismadb.client.findMany(
-     { include:{
-        invoice:true
-      }}
-    );
+    const clients = await prismadb.client.findMany({
+      include: {
+        invoice: true,
+      },
+    });
     const totalCount = await prismadb.client.count();
     const activeCount = await prismadb.client.count({
-      where: wehreClause
+      where: wehreClause,
     });
     const inactiveCount = totalCount - activeCount;
     return sendResponse(res, {
@@ -28,7 +28,7 @@ export const getAllClients = catchAsyncErrors(async (req, res) => {
       data: clients,
       totalCount: totalCount,
       activeCount: activeCount,
-      inactiveCount: inactiveCount
+      inactiveCount: inactiveCount,
     });
   } catch (error) {
     return sendResponse(res, {
@@ -42,13 +42,34 @@ export const getAllClients = catchAsyncErrors(async (req, res) => {
 export const createClient = catchAsyncErrors(async (req, res) => {
   try {
     const {
-      companyName, contactPerson, GST, mobileNum, landLineNum, email, addressLine1,
-      addressLine2, addressLine3, city, pincode, state, country, status
+      companyName,
+      contactPerson,
+      GST,
+      mobileNum,
+      landLineNum,
+      email,
+      addressLine1,
+      addressLine2,
+      addressLine3,
+      city,
+      pincode,
+      state,
+      country,
+      status,
     } = req.body;
 
     // error handling
     if (
-      !companyName || !contactPerson || !GST || !mobileNum || !addressLine1 || !city || !pincode || !state || !country|| !status 
+      !companyName ||
+      !contactPerson ||
+      !GST ||
+      !mobileNum ||
+      !addressLine1 ||
+      !city ||
+      !pincode ||
+      !state ||
+      !country ||
+      !status
     ) {
       return sendResponse(res, {
         status: 400,
@@ -81,8 +102,20 @@ export const createClient = catchAsyncErrors(async (req, res) => {
 
     const newClient = await prismadb.client.create({
       data: {
-        companyName, contactPerson, GST, mobileNum, landLineNum, email, addressLine1,
-        addressLine2, addressLine3, city, pincode, state, country, status,
+        companyName,
+        contactPerson,
+        GST,
+        mobileNum,
+        landLineNum,
+        email,
+        addressLine1,
+        addressLine2,
+        addressLine3,
+        city,
+        pincode,
+        state,
+        country,
+        status,
       },
     });
     return sendResponse(res, {
@@ -147,13 +180,30 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
     }
 
     const {
-      companyName, contactPerson, GST, mobileNum, landLineNum, email, addressLine1,
-      addressLine2, addressLine3, city, pincode, state, country, status,
+      companyName,
+      contactPerson,
+      GST,
+      mobileNum,
+      landLineNum,
+      email,
+      addressLine1,
+      addressLine2,
+      addressLine3,
+      city,
+      pincode,
+      state,
+      country,
+      status,
     } = req.body;
 
     // error handling
     if (
-      !companyName || !contactPerson || !GST || !mobileNum || !addressLine1 || !status
+      !companyName ||
+      !contactPerson ||
+      !GST ||
+      !mobileNum ||
+      !addressLine1 ||
+      !status
     ) {
       return sendResponse(res, {
         status: 400,
@@ -166,8 +216,20 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
         id,
       },
       data: {
-        companyName, contactPerson, GST, mobileNum, landLineNum, email, addressLine1,
-        addressLine2, addressLine3, city, pincode, state, country, status,
+        companyName,
+        contactPerson,
+        GST,
+        mobileNum,
+        landLineNum,
+        email,
+        addressLine1,
+        addressLine2,
+        addressLine3,
+        city,
+        pincode,
+        state,
+        country,
+        status,
       },
     });
 
@@ -190,7 +252,6 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
   }
 });
 
-
 // get client by mobile number and address
 export const searchClients = catchAsyncErrors(async (req, res) => {
   const { query } = req.query;
@@ -198,121 +259,127 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
   let mobileNum = null;
   let address = null;
 
-  if(!isNaN(query)){
-     mobileNum=query;
-  }else{
-    address=query;
+  if (!isNaN(query)) {
+    mobileNum = query;
+  } else {
+    address = query;
   }
 
   const whereClause = {
     OR: [
       mobileNum ? { mobileNum: { contains: mobileNum } } : undefined,
-      address ? {
-        OR: [
-          { addressLine1: { contains: address } },
-        ]
-      } : undefined
-    ].filter(Boolean)
+      address
+        ? {
+            OR: [{ addressLine1: { contains: address } }],
+          }
+        : undefined,
+    ].filter(Boolean),
   };
 
-    const clients = await prismadb.Client.findMany({
-      where: whereClause,
-      include: {
-        invoice: true // Include the invoice relation
-      }
-    }); 
+  const clients = await prismadb.Client.findMany({
+    where: whereClause,
+    include: {
+      invoice: true, // Include the invoice relation
+    },
+  });
 
+  //   const clients = await prismadb.$queryRaw`
+  //   SELECT * FROM Client
+  //   WHERE
+  //     mobileNum LIKE ${'%' + query + '%'} OR
+  //     addressLine1 LIKE ${'%' + query + '%'} OR
+  //     companyName LIKE ${'%' + query + '%'} OR
+  //     contactPerson LIKE ${'%' + query + '%'} OR
+  //     GST LIKE ${'%' + query + '%'} OR
+  //     status LIKE ${'%' + query + '%'}
+  // `;
 
-//   const clients = await prismadb.$queryRaw`
-//   SELECT * FROM Client 
-//   WHERE 
-//     mobileNum LIKE ${'%' + query + '%'} OR
-//     addressLine1 LIKE ${'%' + query + '%'} OR
-//     companyName LIKE ${'%' + query + '%'} OR
-//     contactPerson LIKE ${'%' + query + '%'} OR
-//     GST LIKE ${'%' + query + '%'} OR
-//     status LIKE ${'%' + query + '%'}
-// `;
-
-    if(clients.length === 0){
-      return sendResponse(res, {
-        status: 404,
-        error: "No clients found",
-      });
-    }
-
-    // Ensure that clients with null invoices are handled
-    const clientsWithInvoices = clients.map(client => ({
-      ...client,
-      invoice: client.invoice || [] // If invoice is null, set it to an empty array
-    }));
-
-    // const totalCount = await prismadb.client.count({
-    //   where: whereClause,
-    // });
-
-    // const activeCount = await prismadb.client.count({
-    //   where: {
-    //     AND: [whereClause, { status: "ACTIVE" }]
-    //   },
-    // });
-
-    // const inactiveCount = totalCount - activeCount;
-
+  if (clients.length === 0) {
     return sendResponse(res, {
-      status: 200,
-      data: clients, // Use the modified clients array
-      // totalCount: totalCount,
-      // activeCount: activeCount,
-      // inactiveCount: inactiveCount
+      status: 404,
+      error: "No clients found",
     });
+  }
+
+  // Ensure that clients with null invoices are handled
+  const clientsWithInvoices = clients.map((client) => ({
+    ...client,
+    invoice: client.invoice || [], // If invoice is null, set it to an empty array
+  }));
+
+  // const totalCount = await prismadb.client.count({
+  //   where: whereClause,
+  // });
+
+  // const activeCount = await prismadb.client.count({
+  //   where: {
+  //     AND: [whereClause, { status: "ACTIVE" }]
+  //   },
+  // });
+
+  // const inactiveCount = totalCount - activeCount;
+
+  return sendResponse(res, {
+    status: 200,
+    data: clients, // Use the modified clients array
+    // totalCount: totalCount,
+    // activeCount: activeCount,
+    // inactiveCount: inactiveCount
+  });
 });
 
 // Get single client
 export const getSingleClient = catchAsyncErrors(async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (!id) {
-      return sendResponse(res, {
-        status: 400,
-        error: "Client Id is required",
-      });
-    }
-
-    const client = await prismadb.client.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        invoice: true,
-      },
-    });
-
-    if(!client){
-      return sendResponse(res, {
-        status: 404,
-        error: "no, client not found",
-      });
-    }
-
-    const totalInvoices = client.invoice.length;
-    const paidInvoices = client.invoice.filter(inv => inv.billingStatus === "PAID").length;
-    const pendingInvoices = client.invoice.filter(inv => inv.billingStatus === "PENDING").length;
-    const totalIncome  = client.invoice.reduce((acc, inv) => acc + inv.totalAmount, 0);
-
-    if (!client) {
-      return sendResponse(res, {
-        status: 404,
-        error: "Client not found",
-      });
-    }
-
+  if (!id) {
     return sendResponse(res, {
-      status: 200,
-      data: client,
-      totalIncome: totalIncome,
-      totalInvoices: totalInvoices,
-      paidInvoices: paidInvoices,
-      pendingInvoices: pendingInvoices
+      status: 400,
+      error: "Client Id is required",
     });
+  }
+
+  const client = await prismadb.client.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      invoice: true,
+    },
+  });
+
+  if (!client) {
+    return sendResponse(res, {
+      status: 404,
+      error: "no, client not found",
+    });
+  }
+
+  const totalInvoices = client.invoice.length;
+  const paidInvoices = client.invoice.filter(
+    (inv) => inv.billingStatus === "PAID"
+  ).length;
+  const pendingInvoices = client.invoice.filter(
+    (inv) => inv.billingStatus === "PENDING"
+  ).length;
+  const totalIncome = client.invoice.reduce(
+    (acc, inv) => acc + inv.totalAmount,
+    0
+  );
+
+  if (!client) {
+    return sendResponse(res, {
+      status: 404,
+      error: "Client not found",
+    });
+  }
+
+  return sendResponse(res, {
+    status: 200,
+    data: client,
+    totalIncome: totalIncome,
+    totalInvoices: totalInvoices,
+    paidInvoices: paidInvoices,
+    pendingInvoices: pendingInvoices,
+  });
 });

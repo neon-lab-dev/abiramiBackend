@@ -174,25 +174,11 @@ export const searchPurchases = catchAsyncErrors(async (req, res) => {
     try {
       const { query } = req.query;
 
-      let companyName = null;
-      let totalPurchaseAmt = null;
-    
-      if(!isNaN(query)){
-        totalPurchaseAmt=query;
-      }else{
-        companyName=query;
-      }
-  
       const whereClause = {
         OR: [
-            totalPurchaseAmt && {
-                totalPurchaseAmt: {
-              contains: totalPurchaseAmt
-            }
-          },
-          companyName && {
+          query && {
             OR: [
-              { companyName: { contains: companyName } },
+              { companyName: { contains: query } },
             ]
           }
         ].filter(Boolean)
