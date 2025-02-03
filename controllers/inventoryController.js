@@ -306,15 +306,18 @@ export const deleteInventory = catchAsyncErrors(async (req, res) => {
 export const searchInventories = catchAsyncErrors(async (req, res) => {
   try {
     const { query } = req.query;
+    const {catgoryId} = req.params;
+    console.log("this is catgoryId",catgoryId)
 
     const whereClause = {
-      OR: [
-        query && {
+      AND: [
+        { catgoryId: catgoryId },
+        {
           OR: [
-            { refrence: { contains: query } }
-          ]
+            query && { refrence: { contains: query } }
+          ].filter(Boolean)
         }
-      ].filter(Boolean)
+      ]
     };
 
     const Inventories = await prismadb.Inventory.findMany({
