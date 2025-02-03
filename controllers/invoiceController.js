@@ -1,5 +1,6 @@
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import { sendResponse } from "../middlewares/sendResponse.js";
+import { validateId } from "../utils/validateId.js";
 
 import prismadb from "../db/prismaDb.js";
 
@@ -412,18 +413,27 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
 // get invoice by invoice type and id
 export const searchInvoices = catchAsyncErrors(async (req, res) => {
     try {
-      const { id, invoiceType } = req.query;
+      const { query } = req.query;
+
+      let companyName = null;
+      let clientName = null;
+    
+      if(!isNaN(query)){
+        totalAmount=query;
+      }else{
+        clientName=query;
+      }
   
       const whereClause = {
         OR: [
-            id && {
-                id: {
-              contains: id
+          totalAmount && {
+            totalAmount: {
+              contains: totalAmount
             }
           },
-          invoiceType && {
+          clientName && {
             OR: [
-              { invoiceType: { contains: invoiceType } },
+              { clientName: { contains: clientName } },
             ]
           }
         ].filter(Boolean)
@@ -431,7 +441,17 @@ export const searchInvoices = catchAsyncErrors(async (req, res) => {
   
       const Invoices = await prismadb.BillingDetails.findMany({
         where: whereClause,
+        include: {
+          productDetails: true
+        }
       });
+
+      if(Invoices.length === 0){
+        return sendResponse(res, {
+          status: 404,
+          error: "No invoice found",
+        });
+      }
 
       const totalInvoices = await prismadb.BillingDetails.count({
         where: whereClause

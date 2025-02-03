@@ -193,7 +193,16 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
 
 // get client by mobile number and address
 export const searchClients = catchAsyncErrors(async (req, res) => {
-  const { mobileNum, address } = req.query;
+  const { query } = req.query;
+
+  let mobileNum = null;
+  let address = null;
+
+  if(!isNaN(query)){
+     mobileNum=query;
+  }else{
+    address=query;
+  }
 
   const whereClause = {
     OR: [

@@ -15,21 +15,21 @@ export const getALLPurchases= catchAsyncErrors(async (req, res)=>{
         });
     }
 
-    const totalClients= await prismadb.Purchase.count();
+    const totalPurchases= await prismadb.Purchase.count();
 
-    const activeClients= await prismadb.Purchase.count({
+    const activePurchases= await prismadb.Purchase.count({
         where:{
             status: "active",
         },
     }); 
 
-    const inactiveClinets= totalClients-activeClients;
+    const inactiveClinets= totalPurchases-activePurchases;
 
     return sendResponse(res, {
         status: 200,
         data: purchases,
-        totalClients,
-        activeClients,
+        totalPurchases,
+        activePurchases,
         inactiveClinets,
     });
 })
@@ -167,3 +167,73 @@ export const deletePurchase= catchAsyncErrors(async (req, res)=>{
         data: purchase,
     });
 })
+
+
+// search purchases
+export const searchPurchases = catchAsyncErrors(async (req, res) => {
+    try {
+      const { query } = req.query;
+
+      let companyName = null;
+      let totalPurchaseAmt = null;
+    
+      if(!isNaN(query)){
+        totalPurchaseAmt=query;
+      }else{
+        companyName=query;
+      }
+  
+      const whereClause = {
+        OR: [
+            totalPurchaseAmt && {
+                totalPurchaseAmt: {
+              contains: totalPurchaseAmt
+            }
+          },
+          companyName && {
+            OR: [
+              { companyName: { contains: companyName } },
+            ]
+          }
+        ].filter(Boolean)
+      };
+  
+      const Purchases = await prismadb.Purchase.findMany({
+        where: whereClause,
+      });
+
+      if(Purchases.length === 0){
+        return sendResponse(res, {
+          status: 404,
+          error: "No invoice found",
+        });
+      }
+
+      const totalPurchases= await prismadb.Purchase.count(
+        {where: whereClause}
+      );
+
+      const activePurchases= await prismadb.Purchase.count({
+        where:{
+            AND: [whereClause, { status: "ACTIVE" }]
+        }
+      }); 
+  
+      const inactiveClinets= totalPurchases-activePurchases;
+  
+  
+      return sendResponse(res, {
+        status: 200,
+        data: Purchases,
+        totalPurchases: totalPurchases,
+        activePurchases: activePurchases,
+        inactiveClinets: inactiveClinets,
+      });
+  
+    } catch (error) {
+      return sendResponse(res, {
+        status: 500,
+        error: error.message
+      });
+    }
+  });
