@@ -17,6 +17,11 @@ enum billingStatus{
     DRAFT
 }
 
+enum txnType{
+    SELL
+    BUY
+}
+
 // client model
 model Client{
     id String @id @default(uuid())
@@ -65,12 +70,23 @@ model Inventory{
     warehouseLocation String
     quantityType String
     alarm Int
+    transactions Transactions[]
     image Image?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt @default(now())
-
     catgoryId String
     category Category @relation("CategoryToInventory" , fields: [catgoryId], references: [id] , onDelete: Cascade)
+}
+
+model Transactions{
+    id String @id @default(uuid())
+    txnType String
+    txnUnits Int
+    comments String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt @default(now())
+    inventoryId String
+    inventory Inventory @relation(fields: [inventoryId], references: [id] , onDelete: Cascade)
 }
 
 model Image{

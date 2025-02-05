@@ -4,6 +4,7 @@ import { uploadImage } from "../utils/uploadImage.js";
 import getDataUri from "../utils/getUri.js";
 
 import prismadb from "../db/prismaDb.js";
+import { txnType } from "@prisma/client";
 
 
 // get inventory item details
@@ -200,7 +201,7 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId , image  } = req.body;
+      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , transactions , alarm , catgoryId , image  } = req.body;
   
       // error handling
       if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId
@@ -209,6 +210,23 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
           status: 400,
           error: "Please fill the required fields",
         });
+      }
+
+      console.log("this is transactions",JSON.parse(transactions))
+
+      const{txnType,txnUnits, comments} = JSON.parse(transactions)
+      console.log("this is txnType",txnType)
+      console.log("this is txnUnits",txnUnits)
+      console.log("this is comments",comments)
+
+      quantity = parseInt(quantity); 
+
+      if(transactions){
+        if(txnType=="SELL"){
+          quantity = quantity - txnUnits;
+        }else{
+          quantity = quantity + txnUnits;
+        }
       }
 
       if(req.file){
@@ -233,12 +251,20 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         data: {
             refrence ,
             buyingCost: parseInt(buyingCost) , 
-            quantity: parseInt(quantity) , 
+            quantity: quantity , 
             description , 
             sellingCost: parseInt(sellingCost) , 
             warehouseLocation , 
             quantityType , 
             alarm:parseInt(alarm) , 
+            transactions: {
+              create: {
+                txnType,
+                txnUnits,
+                comments
+              },
+            },
+        
             catgoryId,
             image: {
               update: {
@@ -248,13 +274,16 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
                 thumbnailUrl: image.thumbnailUrl,
             }
         },
+      },
+      include:{
+        image:true,
+        transactions:true
       }
     });
   
       return sendResponse(res, {
         status: 200,
-        data: inventory,
-        image: image
+        data: inventory
       });
     } catch (error) {
       return sendResponse(res, {
@@ -347,3 +376,36 @@ export const searchInventories = catchAsyncErrors(async (req, res) => {
     });
   }
 });
+
+// getInventoryLogs
+export const getInventoryLogs = catchAsyncErrors(async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Inventory Id is required",
+      });
+    }
+
+    const inventorywithLogs= await prismadb.Inventory.findUnique({
+      where:{
+        id,
+      },
+      include:{
+        transactions:true
+      }
+    })
+
+    if (!inventorywithLogs) {
+      return sendResponse(res, {
+        status: 404,
+        error: "Inventory logs not found",
+      });
+    }
+
+    return sendResponse(res, {
+      status: 200,
+      data: inventorywithLogs.transactions,
+    });
+  } 
+);

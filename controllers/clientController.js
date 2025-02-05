@@ -258,7 +258,7 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
 
   let mobileNum = null;
   let address = null;
-
+  
   if (!isNaN(query)) {
     mobileNum = query;
   } else {
