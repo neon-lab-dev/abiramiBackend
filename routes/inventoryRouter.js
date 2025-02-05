@@ -10,13 +10,13 @@ inventoryRouter.use(verifyTokenAdmin);
 inventoryRouter.get("/items", getItemDetails);
 inventoryRouter.get("/", getInventories);
 inventoryRouter.post("/", singleUpload ,createInventory);
+inventoryRouter.get("/category/search", searchCategory);
 inventoryRouter.get("/:id/logs", getInventoryLogs);
 inventoryRouter.get("/:catgoryId/search", searchInventories);
 inventoryRouter.get("/category" , getCategories);
 inventoryRouter.get("/:id", getSingleInventory);
 inventoryRouter.put("/:id",singleUpload, updateInventory);
 inventoryRouter.delete("/:id", deleteInventory);
-inventoryRouter.get("/category/search", searchCategory);
 inventoryRouter.get("/category/:id", getInventoriesByCategory);
 inventoryRouter.post("/category", createCategory);
 

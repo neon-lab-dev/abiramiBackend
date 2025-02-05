@@ -359,7 +359,7 @@ export const searchInventories = catchAsyncErrors(async (req, res) => {
     if(Inventories.length === 0){
       return sendResponse(res, {
         status: 404,
-        error: "No invoice found",
+        error: "cannot search inventory with this query",
       });
     }
 
