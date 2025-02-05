@@ -201,7 +201,7 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , transactions , alarm , catgoryId , image  } = req.body;
+      let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType  , alarm , catgoryId , image  } = req.body;
   
       // error handling
       if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId
@@ -212,22 +212,9 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
         });
       }
 
-      console.log("this is transactions",JSON.parse(transactions))
-
-      const{txnType,txnUnits, comments} = JSON.parse(transactions)
-      console.log("this is txnType",txnType)
-      console.log("this is txnUnits",txnUnits)
-      console.log("this is comments",comments)
 
       quantity = parseInt(quantity); 
 
-      if(transactions){
-        if(txnType=="SELL"){
-          quantity = quantity - txnUnits;
-        }else{
-          quantity = quantity + txnUnits;
-        }
-      }
 
       if(req.file){
         image = await uploadImage(
@@ -375,6 +362,60 @@ export const searchInventories = catchAsyncErrors(async (req, res) => {
       error: error.message
     });
   }
+});
+
+
+// updateLogs
+export const updateLogs = catchAsyncErrors(async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Inventory Id is required",
+      });
+    }
+
+    const { txnType, txnUnits, comments } = req.body;
+
+    const uniqueInventory= await prismadb.Inventory.findUnique({
+      where:{
+        id
+      }
+    })
+    console.log("this is uniqueInventory",uniqueInventory.quantity)
+
+    let quantity=parseInt(uniqueInventory.quantity);
+    console.log("this is quantity",quantity)
+
+    if(txnType=="SELL"){
+      quantity=quantity-txnUnits;
+    }else{
+      quantity=quantity+txnUnits;
+    }
+
+    const inventory = await prismadb.Inventory.update({
+      where: {
+        id,
+      },
+      data: {
+        quantity: quantity,
+        transactions: {
+          create: {
+            txnType,
+            txnUnits,
+            comments,
+          },
+        },
+      },
+      include:{
+        transactions:true,
+      }
+    });
+
+    return sendResponse(res, {
+      status: 200,
+      data: inventory,
+    });
 });
 
 // getInventoryLogs
