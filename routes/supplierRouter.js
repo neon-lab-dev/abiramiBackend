@@ -7,9 +7,9 @@ supplierRouter.use(verifyTokenAdmin);
 
 supplierRouter.get("/", getAllSuppliers);
 supplierRouter.post("/", createSupplier);
+supplierRouter.get("/search", searchSuppliers);
 supplierRouter.get("/:id", getSingleSupplier);
 supplierRouter.put("/:id", updateSupplier);
 supplierRouter.delete("/:id", deleteSupplier);
-supplierRouter.get("/search", searchSuppliers);
 
 export default supplierRouter;
