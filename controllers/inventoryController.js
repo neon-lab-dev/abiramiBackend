@@ -433,7 +433,11 @@ export const getInventoryLogs = catchAsyncErrors(async (req, res) => {
         id,
       },
       include:{
-        transactions:true
+        transactions:{
+          orderBy:{
+            createdAt:"desc"
+          }
+        }
       }
     })
 
