@@ -243,15 +243,7 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
             sellingCost: parseInt(sellingCost) , 
             warehouseLocation , 
             quantityType , 
-            alarm:parseInt(alarm) , 
-            transactions: {
-              create: {
-                txnType,
-                txnUnits,
-                comments
-              },
-            },
-        
+            alarm:parseInt(alarm) ,
             catgoryId,
             image: {
               update: {
@@ -264,7 +256,6 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
       },
       include:{
         image:true,
-        transactions:true
       }
     });
   
