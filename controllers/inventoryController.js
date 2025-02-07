@@ -4,12 +4,13 @@ import { uploadImage } from "../utils/uploadImage.js";
 import getDataUri from "../utils/getUri.js";
 
 import prismadb from "../db/prismaDb.js";
-import { txnType } from "@prisma/client";
 
 
 // get inventory item details
 export const getItemDetails = catchAsyncErrors(async (req, res) => {
   try {
+
+
     // Get total quantity across all inventory
     const totalQuantity = await prismadb.inventory.aggregate({
       _sum: {
@@ -18,13 +19,10 @@ export const getItemDetails = catchAsyncErrors(async (req, res) => {
     });
 
     // Get low stock count
-    const lowStock = await prismadb.inventory.count({
-      where: {
-        quantity: {
-          lt: 10 
-        }
-      }
-    });
+    const allInventory = await prismadb.inventory.findMany();
+
+    const lowStock = allInventory.filter(item => item.quantity < item.alarm).length;
+
 
     // Get out of stock count
     const outOfStock = await prismadb.inventory.count({
