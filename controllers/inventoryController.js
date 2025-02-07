@@ -21,9 +21,8 @@ export const getItemDetails = catchAsyncErrors(async (req, res) => {
     // Get low stock count
     const allInventory = await prismadb.inventory.findMany();
 
-    const lowStock = allInventory.filter(item => item.quantity < item.alarm).length;
-
-
+    const lowStock = allInventory.filter(item => item.quantity !== 0 && item.quantity < item.alarm).length;
+    
     // Get out of stock count
     const outOfStock = await prismadb.inventory.count({
       where: {
