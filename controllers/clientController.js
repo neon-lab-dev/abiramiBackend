@@ -359,6 +359,7 @@ export const getSingleClient = catchAsyncErrors(async (req, res) => {
   const paidInvoices = client.invoice.filter(
     (inv) => inv.billingStatus === "PAID"
   ).length;
+  
   const pendingInvoices = client.invoice.filter(
     (inv) => inv.billingStatus === "PENDING"
   ).length;

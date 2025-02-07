@@ -106,3 +106,56 @@ export const getDashboardData = catchAsyncErrors(async (req, res) => {
     },
   });
 });
+
+
+
+export const getSalesAndPurchase = async (req, res) => {
+
+  const year = new Date().getFullYear();
+
+  const startofYear = formatDate(new Date(`${year}-01-01T00:00:00.000Z`));
+  const endofYear = formatDate(new Date(`${year + 1}-01-01T00:00:00.000Z`));
+
+  // Fetch all sales records for the year
+  const sales = await prismadb.BillingDetails.findMany({
+    where: {
+      date: {
+        gte: startofYear,
+        lt: endofYear
+      },
+      billingStatus: "PAID",
+    },
+  });
+
+  // Fetch all purchase records for the year
+  const purchase = await prismadb.Purchase.findMany({
+    where: {
+      date: {
+        gte: startofYear,
+        lt: endofYear
+      },
+    },
+  });
+
+  // Group sales and purchase by month
+  const salesByMonth = Array(12).fill(0);
+  const purchaseByMonth = Array(12).fill(0);
+
+  sales.forEach((sale) => {
+    const month = new Date(sale.date).getMonth(); // getMonth() returns 0-11
+    salesByMonth[month]++;
+  });
+
+  purchase.forEach((p) => {
+    const month = new Date(p.date).getMonth();
+    purchaseByMonth[month]++;
+  });
+
+  return sendResponse(res, {
+    status: 200,
+    data: {
+      sales: salesByMonth,
+      purchase: purchaseByMonth,
+    },
+  });
+};
