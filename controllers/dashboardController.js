@@ -9,7 +9,7 @@ export const getDashboardData = catchAsyncErrors(async (req, res) => {
   const year = new Date().getFullYear();
   // console.log("year", year)
 
-  const startOfMonth = formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()))
+  const startOfMonth = formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), 0))
 
   const endOfMonth = formatDate(new Date(new Date().getFullYear(), new Date().getMonth()+1, 0))
 
