@@ -26,7 +26,7 @@ enum txnType{
 model Client{
     id String @id @default(uuid())
     companyName String @unique
-    contactPerson String
+    contactPerson String?
     GST String
     mobileNum String
     landLineNum String?
