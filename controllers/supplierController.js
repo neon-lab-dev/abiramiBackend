@@ -88,7 +88,8 @@ export const createSupplier = catchAsyncErrors(async (req, res) => {
     if (
       !companyName ||
       !GST ||
-      !mobileNum
+      !mobileNum ||
+      !status
     ) {
       return sendResponse(res, {
         status: 400,

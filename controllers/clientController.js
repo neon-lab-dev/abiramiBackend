@@ -62,7 +62,8 @@ export const createClient = catchAsyncErrors(async (req, res) => {
     if (
       !companyName ||
       !GST ||
-      !mobileNum 
+      !mobileNum ||
+      !status
     ) {
       return sendResponse(res, {
         status: 400,

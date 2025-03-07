@@ -30,14 +30,14 @@ model Client{
     GST String
     mobileNum String
     landLineNum String?
-    email String @unique
-    addressLine1 String
+    email String?
+    addressLine1 String?
     addressLine2 String?
     addressLine3 String?
-    city String
-    pincode Int
-    state String
-    country String
+    city String?
+    pincode Int?
+    state String?
+    country String?
     status status
     createdAt DateTime @default(now())
     updataedAt DateTime @updatedAt 
@@ -171,18 +171,18 @@ model Purchase{
 model Supplier{
     id String @id @default(uuid())
     companyName String
-    title String
+    title String?
     GST String
     mobileNum String
     landLineNum String?
-    email String @unique
-    addressLine1 String
+    email String?
+    addressLine1 String?
     addressLine2 String?
     addressLine3 String?
-    city String
-    pincode Int
-    state String
-    country String
+    city String?
+    pincode Int?
+    state String?
+    country String?
     status String
     createdAt DateTime @default(now())
     updataedAt DateTime @updatedAt
