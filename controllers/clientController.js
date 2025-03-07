@@ -61,15 +61,8 @@ export const createClient = catchAsyncErrors(async (req, res) => {
     // error handling
     if (
       !companyName ||
-      !contactPerson ||
       !GST ||
-      !mobileNum ||
-      !addressLine1 ||
-      !city ||
-      !pincode ||
-      !state ||
-      !country ||
-      !status
+      !mobileNum 
     ) {
       return sendResponse(res, {
         status: 400,
