@@ -157,7 +157,7 @@ model ProductDetails{
 model Purchase{
     id String @id @default(uuid())
     companyName String
-    invoiceNumber Int
+    invoiceNumber String
     date String
     totalPurchaseAmt Int
     gstNum String
