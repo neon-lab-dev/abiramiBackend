@@ -193,10 +193,8 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
     // error handling
     if (
       !companyName ||
-      !contactPerson ||
       !GST ||
       !mobileNum ||
-      !addressLine1 ||
       !status
     ) {
       return sendResponse(res, {
