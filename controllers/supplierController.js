@@ -87,8 +87,6 @@ export const createSupplier = catchAsyncErrors(async (req, res) => {
     // error handling
     if (
       !companyName ||
-      !GST ||
-      !mobileNum ||
       !status
     ) {
       return sendResponse(res, {
@@ -219,10 +217,6 @@ export const updateSupplier = catchAsyncErrors(async (req, res) => {
     // error handling
     if (
       !companyName ||
-      !title ||
-      !GST ||
-      !mobileNum ||
-      !addressLine1 ||
       !status
     ) {
       return sendResponse(res, {
