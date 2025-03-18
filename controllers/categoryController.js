@@ -145,3 +145,40 @@ export const searchCategory = catchAsyncErrors(async (req, res) => {
     });
   }
 });
+
+// delete category
+export const deleteCategory = catchAsyncErrors(async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Category Id is required",
+      });
+    }
+
+    const category = await prismadb.Category.delete({
+      where: {
+        id,
+      },
+    });
+
+    if (!category) {
+      return sendResponse(res, {
+        status: 404,
+        error: "Category not found",
+      });
+    }
+
+    return sendResponse(res, {
+      status: 200,
+      data: category,
+    });
+  } catch (error) {
+    return sendResponse(res, {
+      status: 500,
+      error: error.message,
+    });
+  }
+});

@@ -27,7 +27,7 @@ model Client{
     id String @id @default(uuid())
     companyName String @unique
     contactPerson String?
-    GST String
+    GST String @unique
     mobileNum String
     landLineNum String?
     email String?
@@ -109,6 +109,7 @@ model Category{
 // invoice model
 model BillingDetails{
     id String @id @default(uuid())
+    invoiceId String?
     clientName String
     date String
     state String

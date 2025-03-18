@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {getItemDetails , createInventory , updateInventory , deleteInventory , getSingleInventory ,getInventories , searchInventories , getInventoryLogs , updateLogs} from "../controllers/inventoryController.js";
-import {getInventoriesByCategory , createCategory , getCategories , searchCategory} from "../controllers/categoryController.js";
+import {getInventoriesByCategory , createCategory , getCategories , searchCategory , deleteCategory} from "../controllers/categoryController.js";
 import { verifyTokenAdmin } from "../middlewares/requireAuth.js";
 import singleUpload from "../middlewares/multer.js";
 
@@ -20,5 +20,6 @@ inventoryRouter.put("/:id",singleUpload, updateInventory);
 inventoryRouter.delete("/:id", deleteInventory);
 inventoryRouter.get("/category/:id", getInventoriesByCategory);
 inventoryRouter.post("/category", createCategory);
+inventoryRouter.delete("/category/:id", deleteCategory);
 
 export default inventoryRouter;

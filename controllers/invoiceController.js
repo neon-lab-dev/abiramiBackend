@@ -1,8 +1,8 @@
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import { sendResponse } from "../middlewares/sendResponse.js";
-import { validateId } from "../utils/validateId.js";
 
 import prismadb from "../db/prismaDb.js";
+import generateInvoiceId from "../utils/generateInvoiceId.js";
 
 // get all invoices
 export const getAllInvoices = catchAsyncErrors(async (req, res) => {
@@ -124,8 +124,11 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
       vehicleNo = null;
     }
 
+    const invoiceId= generateInvoiceId();
+
     const invoice = await prismadb.BillingDetails.create({
       data: {
+        invoiceId,
         clientName,
         date,
         state,
