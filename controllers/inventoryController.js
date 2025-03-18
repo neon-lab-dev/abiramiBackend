@@ -4,19 +4,15 @@ import { uploadImage } from "../utils/uploadImage.js";
 import getDataUri from "../utils/getUri.js";
 
 import prismadb from "../db/prismaDb.js";
+import {generateRefrence} from "../utils/generateRefrence.js";
 
 
 // get inventory item details
 export const getItemDetails = catchAsyncErrors(async (req, res) => {
   try {
 
-
     // Get total quantity across all inventory
-    const totalQuantity = await prismadb.inventory.aggregate({
-      _sum: {
-        quantity: true
-      }
-    });
+    const totalQuantity = await prismadb.inventory.count();
 
     // Get low stock count
     const allInventory = await prismadb.inventory.findMany();
@@ -35,7 +31,7 @@ export const getItemDetails = catchAsyncErrors(async (req, res) => {
     return sendResponse(res, {
       status: 200,
       data: {
-        totalQuantity: totalQuantity._sum.quantity || 0,
+        totalQuantity: totalQuantity,
         lowStock: lowStock || 0,
         outOfStock: outOfStock || 0
       }
@@ -108,10 +104,10 @@ export const getSingleInventory = catchAsyncErrors(async (req, res) => {
 // create inventory
 export const createInventory = catchAsyncErrors(async (req, res) => {
     try {
-      const { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId } = req.body;
+      const {   buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId } = req.body;
      console.log(req.body)
       // error handling
-      if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
+      if ( !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
         return sendResponse(res, {
           status: 400,
           error: "Please fill the required fields",
@@ -127,7 +123,7 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
 
         const existingInventory = await prismadb.Inventory.findFirst({
           where: {
-            AND: [{ refrence }, { quantity: parseInt(quantity) } , {quantityType}],
+            AND: [ { quantity: parseInt(quantity) } , {quantityType}],
           },
         });
         
@@ -149,6 +145,8 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
           error: "Failed to upload image."
         });
       }
+
+      const refrence= generateRefrence();
   
   
       const inventory = await prismadb.Inventory.create({
