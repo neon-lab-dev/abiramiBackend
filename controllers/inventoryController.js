@@ -107,19 +107,19 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
       const {   buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId } = req.body;
      console.log(req.body)
       // error handling
-      if ( !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
+      if (!quantity || !description  || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
         return sendResponse(res, {
           status: 400,
           error: "Please fill the required fields",
         });
       }
 
-        if (!req.file) {
-          return sendResponse({
-              res: 400,
-              error: "Please upload an image file."
-          });
-        }
+        // if (!req.file) {
+        //   return sendResponse({
+        //       res: 400,
+        //       error: "Please upload an image file."
+        //   });
+        // }
 
         const existingInventory = await prismadb.Inventory.findFirst({
           where: {
@@ -133,8 +133,16 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
             error: "Inventoroy already exists",
           });
         }
-
-      const image = await uploadImage(
+      
+      let image= {
+        fileId: "",
+        name: "",
+        url: "",
+        thumbnailUrl: "",
+      };
+      
+      if (req.file) {
+       image = await uploadImage(
         getDataUri(req.file).content,
         getDataUri(req.file).fileName,
         "inventory"
@@ -145,6 +153,7 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
           error: "Failed to upload image."
         });
       }
+    }
 
       const refrence= generateRefrence();
   

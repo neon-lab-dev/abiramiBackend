@@ -3,7 +3,7 @@ function generateInvoiceId() {
     const randomLetters =
       letters.charAt(Math.floor(Math.random() * letters.length)) +
       letters.charAt(Math.floor(Math.random() * letters.length));
-    const randomNumber = Math.floor(100 + Math.random() * 900);
+      const randomNumber = Math.floor(1 + Math.random() * 9999).toString().padStart(4, '0');
   
     // Get the current date
     const today = new Date();

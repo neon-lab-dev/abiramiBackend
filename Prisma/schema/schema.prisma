@@ -63,10 +63,10 @@ model admin{
 model Inventory{
     id String @id @default(uuid())
     refrence String?
-    buyingCost Int
+    buyingCost Int?
     quantity Int
     description String
-    sellingCost Int
+    sellingCost Int?
     warehouseLocation String
     quantityType String
     alarm Int
