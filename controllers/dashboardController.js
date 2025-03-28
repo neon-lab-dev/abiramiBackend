@@ -138,17 +138,27 @@ export const getSalesAndPurchase = async (req, res) => {
   });
 
   // Group sales and purchase by month
-  const salesByMonth = Array(12).fill(0);
-  const purchaseByMonth = Array(12).fill(0);
+  const salesByMonth = Array(12).fill(0).map(() => ({
+    count: 0,
+    totalSales: 0,
+  }));
+
+  const purchaseByMonth = Array(12).fill(0).map(() => ({
+    count: 0,
+    totalPurchase: 0,
+  }));
 
   sales.forEach((sale) => {
     const month = new Date(sale.date).getMonth(); // getMonth() returns 0-11
-    salesByMonth[month]++;
+    salesByMonth[month].count++;
+    salesByMonth[month].totalSales += sale.totalAmount || 0;
   });
 
+  // Group purchases by month
   purchase.forEach((p) => {
-    const month = new Date(p.date).getMonth();
-    purchaseByMonth[month]++;
+    const month = new Date(p.date).getMonth(); // getMonth() returns 0-11
+    purchaseByMonth[month].count++;
+    purchaseByMonth[month].totalPurchase += p.totalPurchaseAmt || 0;
   });
 
   return sendResponse(res, {
