@@ -1,9 +1,6 @@
 function generateInvoiceId() {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const randomLetters =
-      letters.charAt(Math.floor(Math.random() * letters.length)) +
-      letters.charAt(Math.floor(Math.random() * letters.length));
-      const randomNumber = Math.floor(1 + Math.random() * 9999).toString().padStart(4, '0');
+    const letters = 'AB';
+    const randomNumber = Math.floor(1 + Math.random() * 9999).toString().padStart(4, '0');
   
     // Get the current date
     const today = new Date();
@@ -15,7 +12,7 @@ function generateInvoiceId() {
     const endYear = startYear + 1;
     const fiscalYear = `${startYear}-${endYear.toString().slice(-2)}`;
   
-    return `${randomLetters}/${randomNumber}/${fiscalYear}`;
+    return `${letters}/${randomNumber}/${fiscalYear}`;
   }
   
   export default generateInvoiceId;
