@@ -62,7 +62,7 @@ model admin{
 
 model Inventory{
     id String @id @default(uuid())
-    refrence String?
+    refrence String? @unique
     buyingCost Int?
     quantity Int
     description String
@@ -90,7 +90,7 @@ model Transactions{
 }
 
 model Image{
-    fileId String @id
+    fileId String @id @default(uuid())
     name String
     url String
     thumbnailUrl String

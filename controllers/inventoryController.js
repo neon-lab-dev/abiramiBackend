@@ -103,46 +103,37 @@ export const getSingleInventory = catchAsyncErrors(async (req, res) => {
 
 // create inventory
 export const createInventory = catchAsyncErrors(async (req, res) => {
-    try {
-      const {   buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType , alarm , catgoryId } = req.body;
-     console.log(req.body)
-      // error handling
-      if (!quantity || !description  || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
-        return sendResponse(res, {
-          status: 400,
-          error: "Please fill the required fields",
-        });
-      }
+  try {
+    const { buyingCost, quantity, description, sellingCost, warehouseLocation, quantityType, alarm, catgoryId } = req.body;
 
-        // if (!req.file) {
-        //   return sendResponse({
-        //       res: 400,
-        //       error: "Please upload an image file."
-        //   });
-        // }
+    // Validate required fields
+    if (!quantity || !description || !warehouseLocation || !quantityType || !alarm || !catgoryId) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Please fill the required fields",
+      });
+    }
 
-        const existingInventory = await prismadb.Inventory.findFirst({
-          where: {
-            AND: [ { quantity: parseInt(quantity) } , {quantityType}],
-          },
-        });
-        
-        if (existingInventory) {
-          return sendResponse(res, {
-            status: 400,
-            error: "Inventoroy already exists",
-          });
-        }
-      
-      let image= {
-        fileId: "",
-        name: "",
-        url: "",
-        thumbnailUrl: "",
-      };
-      
-      if (req.file) {
-       image = await uploadImage(
+    const existingInventory = await prismadb.Inventory.findFirst({
+      where: {
+        AND: [{ quantity: parseInt(quantity) }, { quantityType }],
+      },
+    });
+
+    if (existingInventory) {
+      return sendResponse(res, {
+        status: 400,
+        error: "Inventory already exists",
+      });
+    }
+
+    // Generate a unique reference
+    const refrence = await generateRefrence();
+
+    let image = null;
+
+    if (req.file) {
+      image = await uploadImage(
         getDataUri(req.file).content,
         getDataUri(req.file).fileName,
         "inventory"
@@ -150,49 +141,72 @@ export const createInventory = catchAsyncErrors(async (req, res) => {
       if (!image) {
         return sendResponse({
           res: 500,
-          error: "Failed to upload image."
+          error: "Failed to upload image.",
         });
       }
     }
 
-      const refrence= generateRefrence();
-  
-  
-      const inventory = await prismadb.Inventory.create({
-        data: {
-            refrence ,
-            buyingCost: parseInt(buyingCost) , 
-            quantity: parseInt(quantity) , 
-            description , 
-            sellingCost: parseInt(sellingCost) , 
-            warehouseLocation , 
-            quantityType , 
-            alarm:parseInt(alarm) , 
-            catgoryId,
-            image:{
-              create:{
-                fileId: image.fileId,
-                name: image.name,
-                url: image.url,
-                thumbnailUrl: image.thumbnailUrl,
-              }
-            }
-        },
-      });
+    // Log the data being passed to Prisma
+    console.log("Creating inventory with data:", {
+      refrence,
+      buyingCost,
+      quantity,
+      description,
+      sellingCost,
+      warehouseLocation,
+      quantityType,
+      alarm,
+      catgoryId,
+      image,
+    });
 
+    const inventoryData = {
+      refrence,
+      buyingCost: parseInt(buyingCost),
+      quantity: parseInt(quantity),
+      description,
+      sellingCost: parseInt(sellingCost),
+      warehouseLocation,
+      quantityType,
+      alarm: parseInt(alarm),
+      catgoryId,
+    };
+
+    // Conditionally include the image field
+    if (image) {
+      inventoryData.image = {
+        create: {
+          fileId: image.fileId,
+          name: image.name,
+          url: image.url,
+          thumbnailUrl: image.thumbnailUrl,
+        },
+      };
+    }
+
+    const inventory = await prismadb.Inventory.create({
+      data: inventoryData,
+    });
+
+    return sendResponse(res, {
+      status: 200,
+      data: inventory,
+      image: image,
+    });
+  } catch (error) {
+    if (error.code === "P2002") {
       return sendResponse(res, {
-        status: 200,
-        data: inventory,
-        image: image
-      });
-    } catch (error) {
-      return sendResponse(res, {
-        status: 500,
-        error: error.message,
-        message: "Failed to create inventory",
+        status: 400,
+        error: "Unique constraint failed. Please try again.",
       });
     }
-  });
+    return sendResponse(res, {
+      status: 500,
+      error: error.message,
+      message: "Failed to create inventory",
+    });
+  }
+});
 
 // update inventory
 export const updateInventory = catchAsyncErrors(async (req, res) => {
@@ -208,7 +222,7 @@ export const updateInventory = catchAsyncErrors(async (req, res) => {
       let { refrence , buyingCost , quantity , description , sellingCost , warehouseLocation , quantityType  , alarm , catgoryId , image  } = req.body;
   
       // error handling
-      if (!refrence || !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId
+      if (  !buyingCost  || !quantity || !description || !sellingCost || !warehouseLocation || !quantityType || !alarm || !catgoryId
       ) {
         return sendResponse(res, {
           status: 400,
