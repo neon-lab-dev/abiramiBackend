@@ -1,5 +1,5 @@
 function generateInvoiceId() {
-    const letters = 'AB';
+    const letters = 'AE';
     const randomNumber = Math.floor(1 + Math.random() * 9999).toString().padStart(4, '0');
   
     // Get the current date
