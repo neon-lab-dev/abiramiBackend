@@ -68,7 +68,7 @@ export const getSinglePurchase= catchAsyncErrors(async (req, res)=>{
 export const createPurchase= catchAsyncErrors(async (req, res)=>{
     const {companyName , invoiceNumber , date ,totalPurchaseAmt , gstNum , status}= req.body;
 
-    if(!companyName || !invoiceNumber || !date || !totalPurchaseAmt || !gstNum || !status){
+    if(!companyName || !invoiceNumber || !date || !totalPurchaseAmt || !status){
         return sendResponse(res, {
             status: 400,
             error: "Please fill all the fields",
