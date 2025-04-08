@@ -64,7 +64,11 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
         id,
       },
       include: {
-        productDetails: true,
+        productDetails: {
+          orderBy:{
+            createdAt: "desc",
+          }
+        },
         client: true
       },
       orderBy:{
@@ -431,6 +435,7 @@ export const searchInvoices = catchAsyncErrors(async (req, res) => {
           query && {
             OR: [
               { clientName: { contains: query } },
+              {invoiceId: { contains: query } },
             ]
           }
         ].filter(Boolean)
