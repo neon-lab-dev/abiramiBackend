@@ -9,7 +9,7 @@ const emailSchema = z.string().email();
 // get all clients
 export const getAllClients = catchAsyncErrors(async (req, res) => {
   try {
-    const wehreClause = {
+    const whereClause = {
       status: "ACTIVE",
     };
 
@@ -17,12 +17,17 @@ export const getAllClients = catchAsyncErrors(async (req, res) => {
       include: {
         invoice: true,
       },
+      orderBy: {
+        createdAt: 'desc', // Add explicit ordering to avoid issues
+      },
     });
+
     const totalCount = await prismadb.client.count();
     const activeCount = await prismadb.client.count({
-      where: wehreClause,
+      where: whereClause,
     });
     const inactiveCount = totalCount - activeCount;
+
     return sendResponse(res, {
       status: 200,
       data: clients,
@@ -37,7 +42,6 @@ export const getAllClients = catchAsyncErrors(async (req, res) => {
     });
   }
 });
-
 // create client
 export const createClient = catchAsyncErrors(async (req, res) => {
   try {
@@ -331,7 +335,7 @@ export const getSingleClient = catchAsyncErrors(async (req, res) => {
     });
   }
 
-  const client = await prismadb.client.findUnique({
+  const client = await prismadb.client.findFirst({
     where: {
       id,
     },

@@ -4,6 +4,7 @@ datasource db {
 }
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 enum status{
@@ -133,7 +134,6 @@ model BillingDetails{
     pfAmount Float?
     roundOff Float?
     client Client @relation("clientToInvoice",fields: [clientName], references: [companyName] , onDelete: Cascade)
-
 
     @@index([id])
     @@index([invoiceType])

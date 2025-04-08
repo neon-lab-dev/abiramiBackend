@@ -12,6 +12,10 @@ export const getAllInvoices = catchAsyncErrors(async (req, res) => {
             include: {
                 productDetails: true
             }
+            ,
+            orderBy:{
+                createdAt: "desc",
+            }
         }
     );
 
@@ -55,7 +59,7 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
       });
     }
 
-    const invoice = await prismadb.BillingDetails.findUnique({
+    const invoice = await prismadb.BillingDetails.findFirst({
       where: {
         id,
       },
@@ -63,6 +67,9 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
         productDetails: true,
         client: true
       },
+      orderBy:{
+        createdAt: "desc",
+      }
     });
 
     if (!invoice) {
