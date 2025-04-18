@@ -191,3 +191,8 @@ model Supplier{
     @@index([mobileNum])
     @@index([addressLine1])
 }
+    
+model InvoiceCounter {
+  id       Int    @id @default(1)
+  lastUsed Int    @default(0)
+}

@@ -135,7 +135,8 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
       vehicleNo = null;
     }
 
-    const invoiceId= generateInvoiceId();
+    const invoiceId= await generateInvoiceId();
+    console.log("this is invoiceId",invoiceId);
 
     const invoice = await prismadb.BillingDetails.create({
       data: {
