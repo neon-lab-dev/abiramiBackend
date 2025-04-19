@@ -116,7 +116,7 @@ export const createInvoice = catchAsyncErrors(async (req, res) => {
     } = req.body;
 
     // error handling
-    if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType || !productDetails) {
+    if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal  ||!roundOff|| !invoiceType || !productDetails) {
       return sendResponse(res, {
         status: 400,
         error: "Please fill the required fields",
@@ -353,7 +353,7 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
    } = req.body;
 
    // error handling
-   if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal || !pfAmount ||!roundOff|| !invoiceType ) {
+   if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal  ||!roundOff|| !invoiceType ) {
      return sendResponse(res, {
        status: 400,
        error: "Please fill the required fields",
