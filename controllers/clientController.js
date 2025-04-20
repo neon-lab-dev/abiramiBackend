@@ -252,24 +252,16 @@ export const updateClient = catchAsyncErrors(async (req, res) => {
 export const searchClients = catchAsyncErrors(async (req, res) => {
   const { query } = req.query;
 
-  let mobileNum = null;
-  let address = null;
-  
-  if (!isNaN(query)) {
-    mobileNum = query;
-  } else {
-    address = query;
-  }
 
   const whereClause = {
     OR: [
-      mobileNum ? { mobileNum: { contains: mobileNum } } : undefined,
-      address
-        ? {
-            OR: [{ addressLine1: { contains: address } }],
-          }
-        : undefined,
-    ].filter(Boolean),
+      query && {
+        OR: [
+          { companyName: { contains: query } },
+          {mobileNum: { contains: query } },
+        ]
+      }
+    ].filter(Boolean)
   };
 
   const clients = await prismadb.Client.findMany({
@@ -279,16 +271,6 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
     },
   });
 
-  //   const clients = await prismadb.$queryRaw`
-  //   SELECT * FROM Client
-  //   WHERE
-  //     mobileNum LIKE ${'%' + query + '%'} OR
-  //     addressLine1 LIKE ${'%' + query + '%'} OR
-  //     companyName LIKE ${'%' + query + '%'} OR
-  //     contactPerson LIKE ${'%' + query + '%'} OR
-  //     GST LIKE ${'%' + query + '%'} OR
-  //     status LIKE ${'%' + query + '%'}
-  // `;
 
   if (clients.length === 0) {
     return sendResponse(res, {
@@ -296,12 +278,6 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
       error: "No clients found",
     });
   }
-
-  // Ensure that clients with null invoices are handled
-  const clientsWithInvoices = clients.map((client) => ({
-    ...client,
-    invoice: client.invoice || [], // If invoice is null, set it to an empty array
-  }));
 
   // const totalCount = await prismadb.client.count({
   //   where: whereClause,
@@ -318,9 +294,6 @@ export const searchClients = catchAsyncErrors(async (req, res) => {
   return sendResponse(res, {
     status: 200,
     data: clients, // Use the modified clients array
-    // totalCount: totalCount,
-    // activeCount: activeCount,
-    // inactiveCount: inactiveCount
   });
 });
 
