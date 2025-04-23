@@ -142,6 +142,7 @@ model BillingDetails{
 
 model ProductDetails{
     id String @id @default(uuid())
+    serialNo Int?
     description String
     HSNno String
     quantity Int

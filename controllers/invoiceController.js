@@ -66,7 +66,7 @@ export const getSingleInvoice = catchAsyncErrors(async (req, res) => {
       include: {
         productDetails: {
           orderBy:{
-            createdAt: "desc",
+            serialNo: "asc",
           }
         },
         client: true
@@ -353,7 +353,7 @@ export const updateInvoice = catchAsyncErrors(async (req, res) => {
    } = req.body;
 
    // error handling
-   if (!clientName || !date || !state || !code || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal  ||!roundOff|| !invoiceType ) {
+   if (!clientName || !date || !state || !code  || !billingStatus || !taxType ||!totalAmount ||!taxGST ||!subTotal  ||!roundOff|| !invoiceType ) {
      return sendResponse(res, {
        status: 400,
        error: "Please fill the required fields",
